@@ -47,6 +47,10 @@ Rules:
   call ask_mom with ONE short Hinglish question offering at most 2 choices. Otherwise do not ask.
 - When you know the cart, call propose_cart once with every item (spinId, skuId, quantity, name, price).
 - Never invent spinId or skuId values; copy them from tool results.
+- If a CURRENT CART is given, Mom has already seen it and her message is about that cart:
+  keep every item she did not mention, apply her change (add / remove / quantity / swap), then call
+  propose_cart with the FULL updated cart. If her message only confirms or declines without any change,
+  call propose_cart with the current cart unchanged. Never ask what she wants when a cart exists.
 - You cannot place orders and must not talk about payment."""
 
 TOOL_SPECS: list[dict[str, Any]] = [
@@ -212,12 +216,22 @@ def compact_products(data: Any) -> Any:
     return {"products": out}
 
 
-async def run_turn(model: Model, swiggy: SwiggyReader, address_id: str, transcript: str) -> AgentResult:
+async def run_turn(
+    model: Model, swiggy: SwiggyReader, address_id: str, transcript: str, current_cart: list[dict[str, Any]] | None = None
+) -> AgentResult:
     log: list[str] = []
     seen_spins: set[str] = set()
     cache: dict[tuple[str, str], dict[str, Any]] = {}  # same query twice -> no second Swiggy call
     searches = 0
-    turn = model.start(SYSTEM_PROMPT, f"Mom said: {transcript}", TOOL_SPECS)
+    user_text = f"Mom said: {transcript}"
+    if current_cart:
+        cart_lines = "\n".join(
+            f"- {c['quantity']} x {c['name']} (spinId {c['spin_id']})" for c in current_cart
+        )
+        user_text = f"CURRENT CART (Mom already saw this):\n{cart_lines}\n\n{user_text}"
+        for c in current_cart:
+            seen_spins.add(c["spin_id"])
+    turn = model.start(SYSTEM_PROMPT, user_text, TOOL_SPECS)
 
     async def read(name: str, args: dict[str, Any]) -> dict[str, Any]:
         key = (name, args.get("query", "").lower())

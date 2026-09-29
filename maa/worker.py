@@ -19,6 +19,7 @@ child's approval (next step). Provider failures always end in a visible message 
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import time
 import uuid
@@ -47,6 +48,11 @@ MSG_TRY_LATER = "Abhi thodi dikkat hai, 5 minute baad phir se bolna 🙏"
 MSG_CANCELLED = "Theek hai, nahi bheja 👍"
 MSG_WAIT_CHILD = "Theek hai! {child} se confirm karke bhejte hain 🙏"
 MSG_BUSY = "Pichla order abhi confirm ho raha hai, uske baad yeh bhi mangwa denge 🙏"
+MSG_CONFIRM_AGAIN = "Toh yahi bhej doon? Sirf *haan* ya *nahi* bol dijiye 🙏"
+
+
+def _same_items(current: list[dict[str, Any]], items: list[Any]) -> bool:
+    return sorted((c["spin_id"], c["quantity"]) for c in current) == sorted((i.spin_id, i.quantity) for i in items)
 
 
 def readback_text(snapshot: CartSnapshot, note: str) -> str:
@@ -122,8 +128,10 @@ async def handle_inbound(deps: Deps, job: Job) -> str:
         return "stale"
 
     draft = deps.store.open_draft(job.family_id)
+    current_cart: list[dict[str, Any]] | None = None
     if draft is not None and draft["state"] == "AWAITING_PARENT":
         reply = classify(text)
+        log.info("reply to draft %s: %r -> %s", draft["id"], text, reply)
         if reply is Reply.YES:
             if deps.store.set_draft_state(draft["id"], "AWAITING_PARENT", "CHILD_APPROVAL_PENDING", now):
                 await deps.send_to_mom(MSG_WAIT_CHILD.format(child=deps.child_name))
@@ -135,17 +143,24 @@ async def handle_inbound(deps: Deps, job: Job) -> str:
                 await sw.call("clear_cart", {})
             await deps.send_to_mom(MSG_CANCELLED)
             return "parent_no"
-        deps.store.set_draft_state(draft["id"], "AWAITING_PARENT", "CANCELLED", now)  # changed request: start over
+        # Not a clear yes/no. Never cancel on a guess: treat it as a change to THIS cart (the agent
+        # sees the current cart), and if the result is the same cart, just ask haan/nahi plainly.
+        current_cart = json.loads(draft["snapshot"])["lines"]
     elif draft is not None:
         await deps.send_to_mom(MSG_BUSY)
         return "busy"
+    else:
+        log.info("new request: %r", text)
 
     try:
         async with deps.swiggy() as sw:
-            result = await run_turn(deps.make_model(), sw, deps.address_id, text)
+            result = await run_turn(deps.make_model(), sw, deps.address_id, text, current_cart=current_cart)
             if result.kind == "question":
-                await deps.send_to_mom(result.question)
+                await deps.send_to_mom(result.question)  # draft (if any) stays open
                 return "asked"
+            if current_cart is not None and _same_items(current_cart, result.items):
+                await deps.send_to_mom(MSG_CONFIRM_AGAIN)  # loop guard (eng D11)
+                return "confirm_again"
             snapshot = await write_cart(sw, deps.address_id, result.items)
     except (AgentOutputError, CartWriteError) as e:
         log.warning("agent/cart failed: %s", e)
@@ -154,6 +169,8 @@ async def handle_inbound(deps: Deps, job: Job) -> str:
 
     # Send first: a draft only waits for "haan" if Mom actually received the readback.
     await deps.send_to_mom(readback_text(snapshot, result.note))
+    if draft is not None:
+        deps.store.set_draft_state(draft["id"], "AWAITING_PARENT", "CANCELLED", now)  # replaced by the updated cart
     deps.store.create_draft(uuid.uuid4().hex[:12], job.family_id, "AWAITING_PARENT", text, snapshot.to_json(), now)
     return "readback"
 

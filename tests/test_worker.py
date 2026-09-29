@@ -5,7 +5,16 @@ import pytest
 
 from maa.agent import ModelTurn, ToolCall
 from maa.store import Store, connect
-from maa.worker import MSG_BUSY, MSG_CANCELLED, MSG_SAY_IT, MSG_TRY_LATER, STALE_AFTER_S, Deps, handle_inbound
+from maa.worker import (
+    MSG_BUSY,
+    MSG_CANCELLED,
+    MSG_CONFIRM_AGAIN,
+    MSG_SAY_IT,
+    MSG_TRY_LATER,
+    STALE_AFTER_S,
+    Deps,
+    handle_inbound,
+)
 from tests.fake_swiggy import FakeSwiggy
 
 ADDR = "ADDR_MOM"
@@ -95,16 +104,65 @@ async def test_nahi_cancels_and_clears_cart(env):
     assert store.open_draft("mom") is None and sw.cart == [] and sent[-1] == MSG_CANCELLED
 
 
-async def test_change_request_starts_a_new_draft(env):
-    deps, store, _sw, _sent, turns = env
+BREAD = {"spinId": "SPIN_BREAD_400", "skuId": "SKU_BREAD_400", "quantity": 1, "name": "Brown Bread", "price": 55}
+
+
+def cart_with_bread_turns():
+    return [
+        ModelTurn(calls=[ToolCall("search_products", {"query": "bread"})]),
+        ModelTurn(calls=[ToolCall("propose_cart", {"items": [MILK, BREAD]})]),
+    ]
+
+
+async def test_change_request_updates_cart_and_replaces_draft(env):
+    deps, store, sw, _sent, turns = env
     turns.append(cart_turns())
-    turns.append(cart_turns())
+    turns.append(cart_with_bread_turns())
     await handle_inbound(deps, job(store, "do packet doodh"))
     first = store.open_draft("mom")["id"]
     store.complete(1, "w")
     assert await handle_inbound(deps, job(store, "haan aur bread bhi")) == "readback"
     assert store.draft_state(first) == "CANCELLED"
     assert store.open_draft("mom")["id"] != first
+    assert {i["spinId"] for i in sw.cart} == {"SPIN_MILK_500", "SPIN_BREAD_400"}
+
+
+async def test_unclear_reply_with_same_cart_asks_plainly_and_keeps_draft(env):
+    deps, store, sw, sent, turns = env
+    turns.append(cart_turns())
+    turns.append([ModelTurn(calls=[ToolCall("propose_cart", {"items": [MILK]})])])
+    await handle_inbound(deps, job(store, "do packet doodh"))
+    first = store.open_draft("mom")["id"]
+    store.complete(1, "w")
+    assert await handle_inbound(deps, job(store, "hmm dekho zara")) == "confirm_again"
+    assert store.open_draft("mom")["id"] == first and store.draft_state(first) == "AWAITING_PARENT"
+    assert sent[-1] == MSG_CONFIRM_AGAIN and sw.cart  # cart untouched
+
+
+async def test_agent_question_keeps_draft_open(env):
+    deps, store, sw, _sent, turns = env
+    turns.append(cart_turns())
+    turns.append([ModelTurn(calls=[ToolCall("ask_mom", {"question": "Kaunsa doodh?"})])])
+    await handle_inbound(deps, job(store, "do packet doodh"))
+    first = store.open_draft("mom")["id"]
+    store.complete(1, "w")
+    assert await handle_inbound(deps, job(store, "doodh ka kya")) == "asked"
+    assert store.draft_state(first) == "AWAITING_PARENT" and sw.cart
+
+
+@pytest.mark.parametrize(("reply", "outcome", "state"), [
+    ("nahii", "parent_no", None),                                   # bug 2026-09-29: was treated as a new order
+    ("theek hai order place kardo", "parent_yes", "CHILD_APPROVAL_PENDING"),  # bug: said "cart empty"
+    ("ठीक है ऑर्डर प्लेस कर दो", "parent_yes", "CHILD_APPROVAL_PENDING"),
+])
+async def test_reported_replies(env, reply, outcome, state):
+    deps, store, _sw, _sent, turns = env
+    turns.append(cart_turns())
+    await handle_inbound(deps, job(store, "do packet doodh"))
+    store.complete(1, "w")
+    assert await handle_inbound(deps, job(store, reply)) == outcome
+    draft = store.open_draft("mom")
+    assert (draft["state"] if draft else None) == state
 
 
 async def test_busy_while_waiting_for_child(env):

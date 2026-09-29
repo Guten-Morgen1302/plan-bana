@@ -1,10 +1,16 @@
 """Code-side yes/no classifier for Mom's reply to a readback (eng D11). The LLM never decides this.
 
-yes  = at least one yes word, no no-word, and no other content words once fillers are removed
-no   = at least one no word and no yes word
-else = "other" (a change request like "haan aur chai patti bhi" goes back to the agent)
+Words are grouped:
+  STRONG_YES  haan / ji / theek / ok / confirm ...   (a yes on their own)
+  VERBS       bhej / kar / kardo / place / de ...    (actions: "yes" only if nothing negates them)
+  NO          nahi / mat / cancel / ruko ...
+  FILLERS     beta / hai / order / abhi / na ...     (ignored)
 
-Sarvam codemix returns Hindi words in Devanagari and English in Latin, so both scripts are listed.
+yes   = (STRONG_YES or VERBS) and no NO word, and no leftover content words
+no    = a NO word and no STRONG_YES   ("cancel kar do", "mat bhejo", "abhi nahi", "nahi nahi")
+other = anything with real content (items, changes, questions): goes to the agent, never cancels
+
+Sarvam codemix returns Hindi words in Devanagari and English words in Latin, so both are listed.
 """
 
 from __future__ import annotations
@@ -12,23 +18,35 @@ from __future__ import annotations
 import re
 from enum import StrEnum
 
-YES = {
-    "haan", "haa", "han", "ha", "hanji", "haanji", "ji", "theek", "thik", "thiik", "bhej", "bhejo", "bhejdo",
-    "yes", "ok", "okay", "done", "sure", "kar", "karo", "chalega", "sahi",
-    "हाँ", "हां", "हा", "जी", "हांजी", "ठीक", "भेज", "भेजो", "करो", "कर", "चलेगा", "सही", "ओके",
+STRONG_YES = {
+    "haan", "haa", "han", "ha", "haanji", "hanji", "haji", "ji", "jee", "theek", "thik", "thiik", "teek", "tik",
+    "yes", "yeah", "yep", "ok", "okay", "okk", "done", "sure", "confirm", "confirmed", "chalega", "chalo",
+    "sahi", "bilkul", "zaroor", "jaroor", "pakka", "perfect", "badhiya", "accha", "acha", "achha",
+    "हाँ", "हां", "हा", "हाँजी", "हांजी", "जी", "ठीक", "ओके", "ओक", "कन्फर्म", "चलेगा", "चलो", "सही",
+    "बिल्कुल", "बिलकुल", "ज़रूर", "जरूर", "पक्का", "परफेक्ट", "बढ़िया", "अच्छा", "यस",
+}
+VERBS = {
+    "bhej", "bhejo", "bhejdo", "bhejdena", "bhejna", "kar", "karo", "kardo", "karde", "kardena", "karna",
+    "place", "placed", "de", "do", "dedo", "dijiye", "mangwa", "mangwao", "mangwado", "order",
+    "भेज", "भेजो", "भेजदो", "भेजना", "कर", "करो", "करदो", "करदे", "करना", "प्लेस", "दे", "दो", "देदो",
+    "दीजिए", "दीजिये", "मंगवा", "मंगवाओ", "मंगवादो", "ऑर्डर", "आर्डर",
 }
 NO = {
-    "nahi", "nahin", "nai", "na", "mat", "no", "cancel", "ruko", "rehne",
-    "नहीं", "नही", "ना", "मत", "रुको", "रहने", "कैंसल",
+    "nahi", "nahin", "nai", "nahii", "nhi", "mat", "no", "nope", "cancel", "ruko", "ruk", "rehne", "rahne",
+    "band", "hatao", "hata",
+    "नहीं", "नही", "नई", "मत", "ना", "नो", "कैंसल", "कैन्सल", "रुको", "रुक", "रहने", "बंद", "हटाओ", "हटा",
 }
 FILLERS = {
-    "beta", "bete", "please", "pls", "plz", "bas", "accha", "acha", "achha", "toh", "to", "de", "do", "dijiye",
-    "hai", "he", "wala", "wale", "sab", "sabh", "abhi", "jaldi", "order",
-    "बेटा", "बेटे", "प्लीज़", "प्लीज", "बस", "अच्छा", "तो", "दे", "दो", "दीजिए", "है", "सब", "अभी", "जल्दी", "ऑर्डर",
+    "beta", "bete", "bhai", "please", "pls", "plz", "bas", "toh", "to", "hai", "he", "hain", "wala", "wale",
+    "sab", "abhi", "jaldi", "yeh", "ye", "yahi", "wahi", "is", "iss", "ko", "na", "naa", "dena", "chahiye",
+    "chaiye", "hmm", "hm", "arre", "are", "achaa", "ab", "phir", "fir", "kuch", "sabhi", "sirf", "bhi",
+    "बेटा", "बेटे", "भाई", "प्लीज़", "प्लीज", "बस", "तो", "है", "हैं", "वाला", "वाले", "सब", "अभी", "जल्दी", "यह", "ये",
+    "यही", "वही", "इस", "को", "देना", "चाहिए", "चाहिये", "हम्म", "अरे", "अब", "फिर", "कुछ", "सिर्फ", "भी",
 }
-VERBS = {"bhej", "bhejo", "bhejdo", "kar", "karo", "भेज", "भेजो", "कर", "करो"}
-# "na" is a filler at the end of a request ("bhej do na") but a no on its own.
 TOKEN_RE = re.compile(r"[\wऀ-ॿ]+")
+# "कर दो" / "place kar do" are split by Sarvam; join common two-word verbs so they read as one.
+JOIN = {("kar", "do"): "kardo", ("kar", "de"): "karde", ("bhej", "do"): "bhejdo", ("de", "do"): "dedo",
+        ("कर", "दो"): "करदो", ("भेज", "दो"): "भेजदो", ("दे", "दो"): "देदो"}
 
 
 class Reply(StrEnum):
@@ -37,22 +55,36 @@ class Reply(StrEnum):
     OTHER = "other"
 
 
+def _tokens(text: str) -> list[str]:
+    raw = [t.lower() for t in TOKEN_RE.findall(text or "")]
+    out: list[str] = []
+    i = 0
+    while i < len(raw):
+        pair = (raw[i], raw[i + 1]) if i + 1 < len(raw) else None
+        if pair in JOIN:
+            out.append(JOIN[pair])
+            i += 2
+        else:
+            out.append(raw[i])
+            i += 1
+    return out
+
+
 def classify(text: str) -> Reply:
-    tokens = [t.lower() for t in TOKEN_RE.findall(text or "")]
+    tokens = _tokens(text)
     if not tokens:
         return Reply.OTHER
-    # "mat bhejo" / "मत भेजो": a no-word right before a verb negates it, so the verb is not a yes.
-    negated = {i + 1 for i, t in enumerate(tokens[:-1]) if t in NO and tokens[i + 1] in VERBS}
-    tokens = [t for i, t in enumerate(tokens) if i not in negated]
-    yes = [t for t in tokens if t in YES]
-    no = [t for t in tokens if t in NO]
-    if no and yes and tokens[-1] in {"na", "ना"} and len(no) == 1:
-        no = []  # "haan bhej do na": trailing "na" is a softener
-    content = [t for t in tokens if t not in YES and t not in NO and t not in FILLERS]
-    if no and not yes and not content:
+    strong = any(t in STRONG_YES for t in tokens)
+    verb = any(t in VERBS for t in tokens)
+    # a lone trailing "na" softens a request ("bhej do na"); elsewhere it's a no
+    no_words = [t for i, t in enumerate(tokens) if t in NO and not (t in {"na", "ना"} and i == len(tokens) - 1 and (strong or verb))]
+    content = [t for t in tokens if t not in STRONG_YES and t not in VERBS and t not in NO and t not in FILLERS]
+
+    if content:
+        # "nahi chahiye" style is covered by FILLERS; real words (items, sizes) mean a change request
+        return Reply.OTHER
+    if no_words and not strong:
         return Reply.NO
-    if yes and not no and not content:
+    if (strong or verb) and not no_words:
         return Reply.YES
-    if no and not yes and len(content) <= 1:
-        return Reply.NO  # "nahi chahiye"
-    return Reply.OTHER
+    return Reply.OTHER  # "haan nahi" etc: ask plainly
