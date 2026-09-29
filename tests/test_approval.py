@@ -10,7 +10,7 @@ from maa.swiggy import OrderBlocked
 from maa.worker import Deps, handle_inbound
 from tests.fake_swiggy import FakeSwiggy
 
-ADDR = "ADDR_MOM"
+ADDR = "ADDRMOM__sig123"  # real ids are "<base>__<suffix>"
 T0 = 1_000_000.0
 CHILD = 777
 MILK = {"spinId": "SPIN_MILK_500", "skuId": "SKU_MILK_500", "quantity": 2, "name": "Amul Taaza 500 ml", "price": 28}
@@ -46,12 +46,12 @@ class OrderingSwiggy(FakeSwiggy):
     """FakeSwiggy plus place_order and the real cart's selectedAddress field."""
 
     def __init__(self, order_result=None, order_exc=None):
-        super().__init__()
+        super().__init__(address_id=ADDR)
         self.order_result, self.order_exc, self.orders = order_result, order_exc, []
 
     def _get_cart(self, args):
         res = super()._get_cart(args)
-        res["parsed"]["selectedAddress"] = self.address_id
+        res["parsed"]["selectedAddress"] = self.address_id.split("__")[0]  # real cart returns the short id
         return res
 
     async def place_order(self, name, arguments):
@@ -230,3 +230,23 @@ async def test_partial_or_pending_payment_reply_needs_review(env):
     _, result, draft = await press(deps, store, tg)
     assert result == "needs_review" and store.draft_state(draft["id"]) == "NEEDS_REVIEW"
     assert "zyada mat dena" not in mom[-1]
+
+
+def test_same_address_matches_base_part():
+    from maa.cart import same_address
+
+    full = "crue9prgn7dq2p7unv90__ASSgxwRZSUUmsc_4gihDzo"
+    assert same_address("crue9prgn7dq2p7unv90", full)
+    assert same_address(full, full)
+    assert not same_address("dae2v3k1d96ie0cs6uhg", full)
+    assert not same_address(None, full)
+
+
+async def test_cart_on_other_address_blocks_order(env):
+    deps, store, sw, tg, mom = env
+    sw.order_exc = None
+    await bind(deps, store)
+    await to_child_approval(deps, store)
+    sw.address_id = "SOMEWHERE__else"
+    _, result, _draft = await press(deps, store, tg)
+    assert result == "wrong_address" and sw.orders == [] and "Harsh" in mom[-1]

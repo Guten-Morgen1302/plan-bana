@@ -21,7 +21,7 @@ import logging
 import secrets
 from typing import Any
 
-from maa.cart import CartWriteError, live_snapshot
+from maa.cart import CartWriteError, live_snapshot, same_address
 from maa.store import Job
 from maa.swiggy import OrderBlocked
 
@@ -150,9 +150,12 @@ async def handle_child_action(deps, job: Job) -> str:
         except CartWriteError:
             await tell_child("⚠️ Couldn't read the Swiggy cart. Nothing ordered; try again in a minute.")
             return "cart_read_failed"
-        if address != deps.address_id:
+        if not same_address(address, deps.address_id):
             store.set_draft_state(draft["id"], "CHILD_APPROVAL_PENDING", "CANCELLED", now)
-            await tell_child("⚠️ The Swiggy cart is set to a different address. Nothing ordered; cancelled.")
+            await tell_child(
+                f"⚠️ The Swiggy cart is set to a different address ({address or 'none'}). Nothing ordered; cancelled."
+            )
+            await deps.send_to_mom("Order nahi gaya, Harsh dekh rahe hain 🙏")
             return "wrong_address"
         if live.hash != snapshot["hash"]:
             store.set_draft_state(draft["id"], "CHILD_APPROVAL_PENDING", "CANCELLED", now)

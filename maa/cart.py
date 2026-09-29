@@ -128,3 +128,11 @@ async def live_snapshot(sw: SwiggyCart) -> tuple[CartSnapshot, str | None]:
     lines = [SnapshotLine(s, names.get(s) or s, q, prices.get(s)) for s, q in _cart_spin_quantities(cart).items()]
     snap = CartSnapshot(lines=lines, total=parse_total(cart), raw_cart=cart, item_total=parse_item_total(cart))
     return snap, cart.get("selectedAddress")
+
+
+def same_address(cart_address: str | None, address_id: str) -> bool:
+    """get_addresses ids look like "<base>__<suffix>"; get_cart reports only "<base>".
+    Compare the base part (observed live 2026-09-29)."""
+    if not cart_address or not address_id:
+        return False
+    return cart_address.split("__", 1)[0] == address_id.split("__", 1)[0]
