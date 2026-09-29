@@ -43,6 +43,7 @@ async def test_transcribe_sends_ogg_and_codemix():
     assert captured["key"] == "KEY"
     assert b'name="mode"' in captured["body"] and b"codemix" in captured["body"]
     assert b'filename="voice.ogg"' in captured["body"]
+    assert b"keyterms" not in captured["body"]  # they get forced into transcripts
 
 
 @pytest.mark.parametrize("status", [429, 500, 503])

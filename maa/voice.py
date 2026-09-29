@@ -10,7 +10,6 @@ Sarvam /speech-to-text (checked 2026-09-29, docs.sarvam.ai):
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 
 import httpx
@@ -18,8 +17,8 @@ import httpx
 GRAPH = "https://graph.facebook.com/v25.0"
 SARVAM_STT_URL = "https://api.sarvam.ai/speech-to-text"
 MAX_VOICE_SECONDS = 30
-# Brand/product words Sarvam should spell the way Swiggy's catalogue does.
-KEYTERMS = ["Amul", "Taaza", "Britannia", "Harvest Gold", "Aashirvaad", "Fortune", "Tata", "Parle", "Maggi", "Instamart"]
+# No `keyterms`: tested 2026-09-29, Sarvam forces them into the transcript
+# ("Coca-Cola diet Coke" came back as "Britannia Harvest Gold, Amul, Instamart").
 
 
 class MediaFetchError(Exception):
@@ -66,7 +65,6 @@ async def transcribe(client: httpx.AsyncClient, audio: bytes, mime: str, api_key
                 "model": "saaras:v4",
                 "mode": "codemix",
                 "language_code": "unknown",
-                "keyterms": json.dumps(KEYTERMS),
             },
             timeout=45,
         )
