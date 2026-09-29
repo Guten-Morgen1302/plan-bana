@@ -16,6 +16,7 @@ Sarvam codemix returns Hindi words in Devanagari and English words in Latin, so 
 from __future__ import annotations
 
 import re
+import unicodedata
 from enum import StrEnum
 
 STRONG_YES = {
@@ -43,7 +44,9 @@ FILLERS = {
     "बेटा", "बेटे", "भाई", "प्लीज़", "प्लीज", "बस", "तो", "है", "हैं", "वाला", "वाले", "सब", "अभी", "जल्दी", "यह", "ये",
     "यही", "वही", "इस", "को", "देना", "चाहिए", "चाहिये", "हम्म", "अरे", "अब", "फिर", "कुछ", "सिर्फ", "भी",
 }
-TOKEN_RE = re.compile(r"[\wऀ-ॿ]+")
+# Devanagari letters/marks only: excludes the danda "।" (U+0964) and "॥" (U+0965) that Sarvam
+# appends as a full stop, which would otherwise glue onto the last word ("नहीं।").
+TOKEN_RE = re.compile("[\\wऀ-ॣ०-ॿ]+")
 # "कर दो" / "place kar do" are split by Sarvam; join common two-word verbs so they read as one.
 JOIN = {("kar", "do"): "kardo", ("kar", "de"): "karde", ("bhej", "do"): "bhejdo", ("de", "do"): "dedo",
         ("कर", "दो"): "करदो", ("भेज", "दो"): "भेजदो", ("दे", "दो"): "देदो"}
@@ -56,7 +59,7 @@ class Reply(StrEnum):
 
 
 def _tokens(text: str) -> list[str]:
-    raw = [t.lower() for t in TOKEN_RE.findall(text or "")]
+    raw = [t.lower() for t in TOKEN_RE.findall(unicodedata.normalize("NFC", text or ""))]
     out: list[str] = []
     i = 0
     while i < len(raw):

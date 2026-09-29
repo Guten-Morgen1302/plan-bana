@@ -131,7 +131,7 @@ async def handle_inbound(deps: Deps, job: Job) -> str:
     current_cart: list[dict[str, Any]] | None = None
     if draft is not None and draft["state"] == "AWAITING_PARENT":
         reply = classify(text)
-        log.info("reply to draft %s: %r -> %s", draft["id"], text, reply)
+        log.info("reply to draft %s: “%s” -> %s", draft["id"], text, reply)
         if reply is Reply.YES:
             if deps.store.set_draft_state(draft["id"], "AWAITING_PARENT", "CHILD_APPROVAL_PENDING", now):
                 await deps.send_to_mom(MSG_WAIT_CHILD.format(child=deps.child_name))
@@ -150,7 +150,7 @@ async def handle_inbound(deps: Deps, job: Job) -> str:
         await deps.send_to_mom(MSG_BUSY)
         return "busy"
     else:
-        log.info("new request: %r", text)
+        log.info("new request: “%s”", text)
 
     try:
         async with deps.swiggy() as sw:
