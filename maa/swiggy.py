@@ -7,6 +7,7 @@ Retry/backoff, reconciliation and the error classifier (eng D3, D7, D10) land he
 from __future__ import annotations
 
 import json
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any
@@ -15,9 +16,18 @@ from mcp.client.session import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 from mcp.shared._httpx_utils import create_mcp_http_client
 
-# Order-placing tools. The LLM never gets these (office-hours premise 4);
-# the probe only calls them behind an explicit typed confirmation.
+# Order-placing tools. The LLM never gets these (office-hours premise 4), and call() refuses them:
+# the only way through is place_order(), which also needs DRY_RUN=0 in the environment.
 PLACE_ORDER_TOOLS = frozenset({"checkout", "place_food_order", "book_table", "place_event_order", "confirm_order"})
+
+
+class OrderBlocked(Exception):
+    """Raised instead of placing a real order."""
+
+
+def orders_enabled() -> bool:
+    """Real orders only when DRY_RUN is explicitly "0". Missing/empty/anything else = blocked."""
+    return os.getenv("DRY_RUN", "1").strip() == "0"
 
 
 class SwiggySession:
@@ -30,6 +40,18 @@ class SwiggySession:
         return [t.name for t in result.tools]
 
     async def call(self, name: str, arguments: dict[str, Any] | None = None) -> dict[str, Any]:
+        if name in PLACE_ORDER_TOOLS:
+            raise OrderBlocked(f"{name} places a real order; use place_order()")
+        return await self._raw_call(name, arguments)
+
+    async def place_order(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        if name not in PLACE_ORDER_TOOLS:
+            raise ValueError(f"{name} is not an order tool")
+        if not orders_enabled():
+            raise OrderBlocked(f"DRY_RUN is on: refusing {self.server}.{name} {arguments}")
+        return await self._raw_call(name, arguments)
+
+    async def _raw_call(self, name: str, arguments: dict[str, Any] | None) -> dict[str, Any]:
         result = await self.session.call_tool(name, arguments or {})
         return result_to_dict(result)
 

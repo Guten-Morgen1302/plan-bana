@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from maa.auth import CredentialStore, login
-from maa.swiggy import PLACE_ORDER_TOOLS, connect
+from maa.swiggy import PLACE_ORDER_TOOLS, connect, orders_enabled
 
 load_dotenv(ROOT / ".env")
 BASE_URL = os.getenv("SWIGGY_BASE_URL", "https://mcp.swiggy.com")
@@ -49,9 +49,9 @@ def save(server: str, tool: str, args: dict, result: dict) -> Path:
     return path
 
 
-async def run_tool(server: str, tool: str, args: dict) -> None:
+async def run_tool(server: str, tool: str, args: dict, *, order: bool = False) -> None:
     async with connect(BASE_URL, server, require_token()) as sw:
-        result = await sw.call(tool, args)
+        result = await (sw.place_order(tool, args) if order else sw.call(tool, args))
     path = save(server, tool, args, result)
     body = result["parsed"] if result["parsed"] is not None else (result["structured"] or result["text"])
     print(json.dumps(body, indent=2, ensure_ascii=False)[:4000])
@@ -92,10 +92,12 @@ async def main() -> None:
     elif ns.cmd == "place":
         if ns.tool not in PLACE_ORDER_TOOLS:
             sys.exit(f"{ns.tool} is not an order tool; use 'call'.")
+        if not orders_enabled():
+            sys.exit("DRY_RUN is on in .env: real orders are blocked. Set DRY_RUN=0 only when you mean it.")
         print(f"This places a REAL order on your Swiggy account: {ns.server}.{ns.tool} {ns.args}")
         if input("Type PLACE to continue: ").strip() != "PLACE":
             sys.exit("Aborted.")
-        await run_tool(ns.server, ns.tool, json.loads(ns.args))
+        await run_tool(ns.server, ns.tool, json.loads(ns.args), order=True)
 
 
 if __name__ == "__main__":
