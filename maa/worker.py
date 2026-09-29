@@ -30,6 +30,7 @@ from typing import Any
 import httpx
 
 from maa.agent import AgentOutputError, Model, run_turn
+from maa.approval import OFFSET_KEY, handle_child_action, handle_telegram_update, request_child_approval
 from maa.cart import CartSnapshot, CartWriteError, write_cart
 from maa.classify import Reply, classify
 from maa.store import Job, Store
@@ -78,6 +79,7 @@ class Deps:
     address_id: str
     child_name: str = "Harsh"
     clock: Callable[[], float] = time.time
+    telegram: Any = None  # maa.telegram.TelegramBot; None in tests that don't need the child
 
 
 async def _transcript(deps: Deps, payload: dict[str, Any]) -> str | None:
@@ -125,6 +127,7 @@ async def handle_inbound(deps: Deps, job: Job) -> str:
         if reply is Reply.YES:
             if deps.store.set_draft_state(draft["id"], "AWAITING_PARENT", "CHILD_APPROVAL_PENDING", now):
                 await deps.send_to_mom(MSG_WAIT_CHILD.format(child=deps.child_name))
+                await request_child_approval(deps, draft["id"])
             return "parent_yes"
         if reply is Reply.NO:
             deps.store.set_draft_state(draft["id"], "AWAITING_PARENT", "CANCELLED", now)
@@ -165,7 +168,9 @@ async def run_worker(deps: Deps, stop: asyncio.Event, owner: str = "worker-1", p
                 pass
             continue
         try:
-            if job.kind == "inbound":
+            if job.kind == "child_action":
+                log.info("job %s child_action -> %s", job.id, await handle_child_action(deps, job))
+            elif job.kind == "inbound":
                 outcome = await handle_inbound(deps, job)
                 log.info("job %s inbound -> %s", job.id, outcome)
                 if payload_wamid := job.payload.get("wamid"):
@@ -178,3 +183,26 @@ async def run_worker(deps: Deps, stop: asyncio.Event, owner: str = "worker-1", p
                 await deps.send_to_mom(MSG_TRY_LATER)
             except Exception:
                 log.exception("could not notify Mom about job %s", job.id)
+
+
+async def run_telegram_poller(deps: Deps, stop: asyncio.Event) -> None:
+    """Long-polls Telegram for the child's /start and button presses."""
+    while not stop.is_set():
+        offset = deps.store.get_setting(OFFSET_KEY)
+        try:
+            updates = await deps.telegram.get_updates(int(offset) if offset else None)
+        except Exception:
+            log.exception("telegram poll failed")
+            await asyncio.sleep(5)
+            continue
+        for upd in updates:
+            try:
+                outcome = await handle_telegram_update(deps, upd, deps.clock())
+                log.info("telegram update %s -> %s", upd.get("update_id"), outcome)
+                if outcome == "bound":
+                    draft = deps.store.open_draft("mom")
+                    if draft is not None and draft["state"] == "CHILD_APPROVAL_PENDING":
+                        await request_child_approval(deps, draft["id"])
+            except Exception:
+                log.exception("telegram update %s failed", upd.get("update_id"))
+            deps.store.set_setting(OFFSET_KEY, str(upd["update_id"] + 1))

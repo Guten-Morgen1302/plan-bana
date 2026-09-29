@@ -62,6 +62,11 @@ CREATE TABLE IF NOT EXISTS drafts (
 );
 CREATE INDEX IF NOT EXISTS drafts_family ON drafts (family_id, state);
 
+CREATE TABLE IF NOT EXISTS settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS inbound_messages (
     wamid        TEXT PRIMARY KEY,
     family_id    TEXT NOT NULL,
@@ -133,6 +138,28 @@ class Store:
         return self.conn.execute(
             "DELETE FROM inbound_messages WHERE state = 'completed' AND completed_at < ?", (now - keep_s,)
         ).rowcount
+
+    # ---------- settings ----------
+
+    def get_setting(self, key: str) -> str | None:
+        row = self.conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
+        return row["value"] if row else None
+
+    def set_setting(self, key: str, value: str) -> None:
+        self.conn.execute(
+            "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            (key, value),
+        )
+
+    def take_setting(self, key: str) -> str | None:
+        """Read and delete in one step (single-use codes)."""
+        with self._tx():
+            value = self.get_setting(key)
+            self.conn.execute("DELETE FROM settings WHERE key = ?", (key,))
+        return value
+
+    def get_draft(self, draft_id: str) -> sqlite3.Row | None:
+        return self.conn.execute("SELECT * FROM drafts WHERE id = ?", (draft_id,)).fetchone()
 
     # ---------- drafts ----------
 

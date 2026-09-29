@@ -115,3 +115,16 @@ async def write_cart(sw: SwiggyCart, address_id: str, items: list[CartItem]) -> 
     else:
         lines = [SnapshotLine(i.spin_id, i.name, i.quantity, i.price) for i in items]
     return CartSnapshot(lines=lines, total=parse_total(cart), raw_cart=cart, item_total=parse_item_total(cart))
+
+
+async def live_snapshot(sw: SwiggyCart) -> tuple[CartSnapshot, str | None]:
+    """Re-read the real cart right before ordering. Returns (snapshot, selectedAddress id)."""
+    got = await sw.call("get_cart", {})
+    cart = got.get("parsed")
+    if got.get("is_error") or not isinstance(cart, dict):
+        raise CartWriteError(f"get_cart failed: {got.get('text', '')[:300]}")
+    names = {str(i.get("spinId")): f"{i.get('itemName', '')} {i.get('itemVariant', '')}".strip() for i in cart.get("items") or []}
+    prices = {str(i.get("spinId")): _to_float(i.get("discountedFinalPrice")) for i in cart.get("items") or []}
+    lines = [SnapshotLine(s, names.get(s) or s, q, prices.get(s)) for s, q in _cart_spin_quantities(cart).items()]
+    snap = CartSnapshot(lines=lines, total=parse_total(cart), raw_cart=cart, item_total=parse_item_total(cart))
+    return snap, cart.get("selectedAddress")

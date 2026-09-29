@@ -43,8 +43,9 @@ def start_worker_thread() -> tuple[threading.Thread, Callable[[], None]]:
     from maa.auth import CredentialStore
     from maa.gemini import GeminiModel
     from maa.swiggy import connect as swiggy_connect
+    from maa.telegram import TelegramBot
     from maa.wa_send import WhatsAppSender
-    from maa.worker import Deps, run_worker
+    from maa.worker import Deps, run_telegram_poller, run_worker
 
     loop = asyncio.new_event_loop()
     stop = asyncio.Event()
@@ -69,8 +70,9 @@ def start_worker_thread() -> tuple[threading.Thread, Callable[[], None]]:
                 sarvam_key=os.environ["SARVAM_API_KEY"],
                 address_id=os.environ["MOM_ADDRESS_ID"],
                 child_name=os.getenv("CHILD_NAME", "Harsh"),
+                telegram=TelegramBot(http, os.environ["TELEGRAM_BOT_TOKEN"]),
             )
-            await run_worker(deps, stop)
+            await asyncio.gather(run_worker(deps, stop), run_telegram_poller(deps, stop))
 
     thread = threading.Thread(target=lambda: loop.run_until_complete(main()), name="maa-worker", daemon=True)
     thread.start()
