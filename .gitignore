@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# secrets and local state
+.env
+.secrets/
+*.db
+*.db.bak
+
+# raw probe output contains real addresses/orders; sanitize before committing as fixtures
+probe_out/

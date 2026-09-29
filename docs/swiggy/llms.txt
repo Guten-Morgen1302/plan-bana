@@ -1,0 +1,115 @@
+# Swiggy Builders Club
+
+> Swiggy Builders Club is the ecosystem program around Swiggy's MCP stack - Food, Instamart, Dineout, and Scenes. Build AI agents, copilots, and integrations on top of 60+ tools across 4 MCP servers.
+
+> Each link below points at a `.md` twin of the page. Fetch the `.md` for clean markdown; fetch the page URL (without `.md`) for the rendered HTML version.
+
+## Docs
+
+- [Multi-turn cart state](https://mcp.swiggy.com/builders/docs/build/agent-patterns/multi-turn-state.md): Carrying cart identity across user turns on a stateless protocol.
+- [Voice vs chat](https://mcp.swiggy.com/builders/docs/build/agent-patterns/voice-vs-chat.md): The same Swiggy tool, different response contracts. Design for TTS and rich cards separately.
+- [Build](https://mcp.swiggy.com/builders/docs/build/index.md): Recipes and patterns for shipping agents that use Swiggy MCP.
+- [Book a table](https://mcp.swiggy.com/builders/docs/build/recipes/book-a-table.md): Dineout journey - find a restaurant, check availability, reserve.
+- [Plan my evening (combined)](https://mcp.swiggy.com/builders/docs/build/recipes/combined.md): One user ask, two MCP servers - Food delivery and Dineout reservations composed in a single agent turn.
+- [Order food end-to-end](https://mcp.swiggy.com/builders/docs/build/recipes/order-food.md): The canonical 7-tool Food journey - from address to placed order to delivery tracking.
+- [Order groceries end-to-end](https://mcp.swiggy.com/builders/docs/build/recipes/order-groceries.md): Full Instamart journey - find products, build a cart, checkout, track delivery.
+- [Pay with UPI end-to-end](https://mcp.swiggy.com/builders/docs/build/recipes/pay-with-upi.md): The shared UPI Payment stage - from picker to paid order to tracking - across Food, Instamart, Dineout, and Scenes.
+- [Ship to production](https://mcp.swiggy.com/builders/docs/build/ship-to-production.md): Retries, observability, and the go-live checklist.
+- [Widgets](https://mcp.swiggy.com/builders/docs/build/widgets.md): Render-ready UI fragments that Swiggy MCP servers can return alongside tool responses.
+- [Swiggy Builders Club](https://mcp.swiggy.com/builders/docs/index.md): Build commerce into your AI agent. Food, Instamart, Dineout, and Scenes - 66 MCP tools, India-first.
+- [Access & onboarding](https://mcp.swiggy.com/builders/docs/operate/access.md): Apply for production access - what we look for, what you provide, turnaround.
+- [Changelog](https://mcp.swiggy.com/builders/docs/operate/changelog.md): What shipped when, grouped by release.
+- [Data & compliance](https://mcp.swiggy.com/builders/docs/operate/data-and-compliance.md): DPDP 2023 posture, data residency, consent, no-PII stance, certifications.
+- [Operate](https://mcp.swiggy.com/builders/docs/operate/index.md): The partner contract - SLA, rate limits, data handling, versioning, support.
+- [Rate limits](https://mcp.swiggy.com/builders/docs/operate/rate-limits.md): How Swiggy MCP handles abusive traffic today, the quotas we plan to advertise, and how to request a larger allocation.
+- [SLA & uptime](https://mcp.swiggy.com/builders/docs/operate/sla.md): Service-level objectives for Swiggy MCP endpoints.
+- [Support](https://mcp.swiggy.com/builders/docs/operate/support.md): How to reach us, incident severities, co-branding, and agent error reporting.
+- [Versioning](https://mcp.swiggy.com/builders/docs/operate/versioning.md): SemVer commitment, deprecation window, how we announce breaking changes.
+- [book_table](https://mcp.swiggy.com/builders/docs/reference/dineout/book_table.md): 
+- [cancel_booking](https://mcp.swiggy.com/builders/docs/reference/dineout/cancel_booking.md): 
+- [check_payment_status](https://mcp.swiggy.com/builders/docs/reference/dineout/check_payment_status.md): 
+- [confirm_order](https://mcp.swiggy.com/builders/docs/reference/dineout/confirm_order.md): 
+- [create_cart](https://mcp.swiggy.com/builders/docs/reference/dineout/create_cart.md): 
+- [get_available_slots](https://mcp.swiggy.com/builders/docs/reference/dineout/get_available_slots.md): 
+- [get_booking_status](https://mcp.swiggy.com/builders/docs/reference/dineout/get_booking_status.md): 
+- [get_payment_options](https://mcp.swiggy.com/builders/docs/reference/dineout/get_payment_options.md): 
+- [get_restaurant_details](https://mcp.swiggy.com/builders/docs/reference/dineout/get_restaurant_details.md): 
+- [get_saved_locations](https://mcp.swiggy.com/builders/docs/reference/dineout/get_saved_locations.md): 
+- [Dineout](https://mcp.swiggy.com/builders/docs/reference/dineout/index.md): Swiggy Dineout MCP Server - Your AI-powered restaurant discovery and table booking assistant. Find the best restaurants near you, explore exclusive deals and offers, check real-time availability, and…
+- [report_error](https://mcp.swiggy.com/builders/docs/reference/dineout/report_error.md): 
+- [search_restaurants_dineout](https://mcp.swiggy.com/builders/docs/reference/dineout/search_restaurants_dineout.md): 
+- [Error codes](https://mcp.swiggy.com/builders/docs/reference/errors.md): How Swiggy MCP tools report failures, and how to react to each class of error.
+- [apply_food_coupon](https://mcp.swiggy.com/builders/docs/reference/food/apply_food_coupon.md): 
+- [check_payment_status](https://mcp.swiggy.com/builders/docs/reference/food/check_payment_status.md): 
+- [confirm_order](https://mcp.swiggy.com/builders/docs/reference/food/confirm_order.md): 
+- [create_address](https://mcp.swiggy.com/builders/docs/reference/food/create_address.md): Swiggy (Instamart/Food): Create a new delivery address for the authenticated user.
+- [delete_address](https://mcp.swiggy.com/builders/docs/reference/food/delete_address.md): Swiggy (Instamart/Food): Delete a saved delivery address for the authenticated user.
+- [fetch_food_coupons](https://mcp.swiggy.com/builders/docs/reference/food/fetch_food_coupons.md): 
+- [flush_food_cart](https://mcp.swiggy.com/builders/docs/reference/food/flush_food_cart.md): 
+- [get_addresses](https://mcp.swiggy.com/builders/docs/reference/food/get_addresses.md): 
+- [get_food_cart](https://mcp.swiggy.com/builders/docs/reference/food/get_food_cart.md): 
+- [get_food_delivery_status](https://mcp.swiggy.com/builders/docs/reference/food/get_food_delivery_status.md): 
+- [get_food_order_details](https://mcp.swiggy.com/builders/docs/reference/food/get_food_order_details.md): 
+- [get_food_orders](https://mcp.swiggy.com/builders/docs/reference/food/get_food_orders.md): 
+- [get_payment_options](https://mcp.swiggy.com/builders/docs/reference/food/get_payment_options.md): 
+- [get_restaurant_menu](https://mcp.swiggy.com/builders/docs/reference/food/get_restaurant_menu.md): 
+- [Food](https://mcp.swiggy.com/builders/docs/reference/food/index.md): Swiggy Food MCP Server - Your AI-powered food delivery assistant. Discover restaurants, explore menus, customize your order with variants and add-ons, apply coupons for great discounts, and get delic…
+- [place_food_order](https://mcp.swiggy.com/builders/docs/reference/food/place_food_order.md): 
+- [report_error](https://mcp.swiggy.com/builders/docs/reference/food/report_error.md): 
+- [search_menu](https://mcp.swiggy.com/builders/docs/reference/food/search_menu.md): 
+- [search_restaurants](https://mcp.swiggy.com/builders/docs/reference/food/search_restaurants.md): Search and order food from restaurants for delivery. PRIMARY FOOD DELIVERY SERVICE - Use this when user wants to order food, get food delivered, or search restaurants for delivery. Swiggy Food delive...
+- [track_food_order](https://mcp.swiggy.com/builders/docs/reference/food/track_food_order.md): 
+- [update_food_cart](https://mcp.swiggy.com/builders/docs/reference/food/update_food_cart.md): 
+- [Reference](https://mcp.swiggy.com/builders/docs/reference/index.md): Every Swiggy MCP tool, grouped by server and journey stage.
+- [apply_coupon](https://mcp.swiggy.com/builders/docs/reference/instamart/apply_coupon.md): 
+- [check_payment_status](https://mcp.swiggy.com/builders/docs/reference/instamart/check_payment_status.md): 
+- [checkout](https://mcp.swiggy.com/builders/docs/reference/instamart/checkout.md): 
+- [clear_cart](https://mcp.swiggy.com/builders/docs/reference/instamart/clear_cart.md): 
+- [confirm_order](https://mcp.swiggy.com/builders/docs/reference/instamart/confirm_order.md): 
+- [create_address](https://mcp.swiggy.com/builders/docs/reference/instamart/create_address.md): Swiggy (Instamart/Food): Create a new delivery address for the authenticated user.
+- [delete_address](https://mcp.swiggy.com/builders/docs/reference/instamart/delete_address.md): Swiggy (Instamart/Food): Delete a saved delivery address for the authenticated user.
+- [get_addresses](https://mcp.swiggy.com/builders/docs/reference/instamart/get_addresses.md): 
+- [get_cart](https://mcp.swiggy.com/builders/docs/reference/instamart/get_cart.md): 
+- [get_delivery_status](https://mcp.swiggy.com/builders/docs/reference/instamart/get_delivery_status.md): 
+- [get_order_details](https://mcp.swiggy.com/builders/docs/reference/instamart/get_order_details.md): 
+- [get_orders](https://mcp.swiggy.com/builders/docs/reference/instamart/get_orders.md): 
+- [get_payment_options](https://mcp.swiggy.com/builders/docs/reference/instamart/get_payment_options.md): 
+- [Instamart](https://mcp.swiggy.com/builders/docs/reference/instamart/index.md): Swiggy Instamart MCP Server - Your AI-powered grocery and essentials shopping assistant. Get everything delivered in minutes — from fresh fruits, vegetables, dairy, and staples to snacks, beverages, …
+- [list_coupons](https://mcp.swiggy.com/builders/docs/reference/instamart/list_coupons.md): 
+- [report_error](https://mcp.swiggy.com/builders/docs/reference/instamart/report_error.md): 
+- [search_products](https://mcp.swiggy.com/builders/docs/reference/instamart/search_products.md): 
+- [track_order](https://mcp.swiggy.com/builders/docs/reference/instamart/track_order.md): 
+- [update_cart](https://mcp.swiggy.com/builders/docs/reference/instamart/update_cart.md): 
+- [your_go_to_items](https://mcp.swiggy.com/builders/docs/reference/instamart/your_go_to_items.md): 
+- [check_payment_status](https://mcp.swiggy.com/builders/docs/reference/scenes/check_payment_status.md): 
+- [confirm_order](https://mcp.swiggy.com/builders/docs/reference/scenes/confirm_order.md): 
+- [create_event_cart](https://mcp.swiggy.com/builders/docs/reference/scenes/create_event_cart.md): 
+- [discover_events](https://mcp.swiggy.com/builders/docs/reference/scenes/discover_events.md): 
+- [get_event_booking_status](https://mcp.swiggy.com/builders/docs/reference/scenes/get_event_booking_status.md): 
+- [get_event_cart](https://mcp.swiggy.com/builders/docs/reference/scenes/get_event_cart.md): 
+- [get_event_details](https://mcp.swiggy.com/builders/docs/reference/scenes/get_event_details.md): 
+- [get_event_venue_info](https://mcp.swiggy.com/builders/docs/reference/scenes/get_event_venue_info.md): 
+- [get_events_collection](https://mcp.swiggy.com/builders/docs/reference/scenes/get_events_collection.md): 
+- [get_payment_options](https://mcp.swiggy.com/builders/docs/reference/scenes/get_payment_options.md): 
+- [get_saved_locations](https://mcp.swiggy.com/builders/docs/reference/scenes/get_saved_locations.md): 
+- [Scenes](https://mcp.swiggy.com/builders/docs/reference/scenes/index.md): Swiggy Scenes MCP Server — Discover events, shows, and live performances at venues. Find show schedules, seat availability, and ticket details for events at Dineout restaurants and standalone venues.
+- [list_event_shows](https://mcp.swiggy.com/builders/docs/reference/scenes/list_event_shows.md): 
+- [place_event_order](https://mcp.swiggy.com/builders/docs/reference/scenes/place_event_order.md): 
+- [report_error](https://mcp.swiggy.com/builders/docs/reference/scenes/report_error.md): 
+- [search_events](https://mcp.swiggy.com/builders/docs/reference/scenes/search_events.md): 
+- [Authenticate](https://mcp.swiggy.com/builders/docs/start/authenticate.md): OAuth 2.1 with PKCE - how to get credentials, complete the flow, and handle expired tokens.
+- [Coding agents](https://mcp.swiggy.com/builders/docs/start/coding-agents.md): Plug Swiggy Builders Club docs into Claude Code, Cursor, Windsurf, and other AI coding tools - so your agent reads authoritative docs before it writes code against Swiggy.
+- [Use Swiggy in your AI client](https://mcp.swiggy.com/builders/docs/start/consumer/index.md): Paste a config, complete OAuth, and ask your existing AI client to order food. No code required.
+- [Connect your AI client](https://mcp.swiggy.com/builders/docs/start/consumer/use-in-ai-client.md): Six configurations for adding Swiggy MCP to Claude Desktop, ChatGPT, Cursor, VS Code, Windsurf, and any MCP-compatible client.
+- [Build an agent](https://mcp.swiggy.com/builders/docs/start/developer/build-an-agent.md): Working code to wire Swiggy MCP into the framework you already use.
+- [Developer quickstart](https://mcp.swiggy.com/builders/docs/start/developer/index.md): Zero to first successful Swiggy tool call, self-serve.
+- [Delegated auth](https://mcp.swiggy.com/builders/docs/start/enterprise/delegated-auth.md): OAuth 2.1 on-behalf-of flow for multi-tenant platforms serving end users at scale.
+- [Power an agent platform](https://mcp.swiggy.com/builders/docs/start/enterprise/index.md): White-glove onboarding for agent-platform operators running Swiggy on behalf of many end users.
+- [Start](https://mcp.swiggy.com/builders/docs/start/index.md): Pick your path - developer, enterprise, or AI-client consumer.
+- [What is Swiggy MCP?](https://mcp.swiggy.com/builders/docs/start/what-is-swiggy-mcp.md): What Swiggy Builders Club offers, who it's for, and when to use it.
+
+## Blog
+
+- [Address, Created: create_address Goes GA on Swiggy MCP](https://mcp.swiggy.com/builders/blog/2026-08-24-create-address-ga.md): create_address and delete_address are now available to every authenticated Swiggy user — no whitelist, no app handoff. Lat/lng are optional too: the server geocodes from the address itself.
+- [Pay in Chat: UPI Payments Come to Swiggy MCP](https://mcp.swiggy.com/builders/blog/2026-07-10-mcp-payments-upi.md): Swiggy MCP now supports in-chat UPI payments across Food, Instamart, and Dineout - one payment picker, device-aware UPI intent and scan-QR, and a status flow that finalizes orders safely without your agent babysitting a poll loop.
+- [Swiggy Announces Builders Club - Turning AI Commerce Infrastructure into a Builder Ecosystem](https://mcp.swiggy.com/builders/blog/2026-04-17-builders-club-launch.md): A new community and partnership program for developers, startups and enterprises building on top of Swiggy's MCP stack.

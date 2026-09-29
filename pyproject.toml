@@ -1,0 +1,21 @@
+[project]
+name = "maa-ka-swiggy"
+version = "0.1.0"
+description = "Hinglish WhatsApp voice-note grocery agent for parents, built on Swiggy MCP"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=2.2",
+    "httpx>=0.28",
+    "python-dotenv>=1.0",
+    "google-genai>=2.25",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
