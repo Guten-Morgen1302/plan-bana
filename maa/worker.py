@@ -53,8 +53,13 @@ def readback_text(snapshot: CartSnapshot, note: str) -> str:
     for n, ln in enumerate(snapshot.lines, 1):
         price = f" – ₹{ln.unit_price * ln.quantity:g}" if ln.unit_price is not None else ""
         lines.append(f"{n}. {ln.quantity} x {ln.name}{price}")
-    if snapshot.total is not None:
-        lines.append(f"\nKul: ₹{snapshot.total:g} (delivery ke saath)")
+    extra = snapshot.extra_charges
+    if snapshot.total is not None and extra:
+        lines.append(f"\nSaaman: ₹{snapshot.item_total:g}")
+        lines.append(f"Delivery, handling aur GST: ₹{extra:g}")
+        lines.append(f"*Kul: ₹{snapshot.total:g}*")
+    elif snapshot.total is not None:
+        lines.append(f"\n*Kul: ₹{snapshot.total:g}*")
     if note:
         lines.append(f"\n{note}")
     lines.append("\nBhej doon? *haan* ya *nahi* bolo")
@@ -144,8 +149,9 @@ async def handle_inbound(deps: Deps, job: Job) -> str:
         await deps.send_to_mom(MSG_TRY_LATER)
         return "agent_failed"
 
-    deps.store.create_draft(uuid.uuid4().hex[:12], job.family_id, "AWAITING_PARENT", text, snapshot.to_json(), now)
+    # Send first: a draft only waits for "haan" if Mom actually received the readback.
     await deps.send_to_mom(readback_text(snapshot, result.note))
+    deps.store.create_draft(uuid.uuid4().hex[:12], job.family_id, "AWAITING_PARENT", text, snapshot.to_json(), now)
     return "readback"
 
 

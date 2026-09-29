@@ -35,6 +35,7 @@ class CartSnapshot:
     lines: list[SnapshotLine]
     total: float | None           # Swiggy's "To Pay" (includes fees), authoritative for Mom's amount
     raw_cart: dict[str, Any]
+    item_total: float | None = None  # "Item Total" line; total - item_total = fees + GST
 
     @property
     def hash(self) -> str:
@@ -44,7 +45,16 @@ class CartSnapshot:
         return hashlib.sha256(key.encode()).hexdigest()[:16]
 
     def to_json(self) -> str:
-        return json.dumps({"lines": [asdict(ln) for ln in self.lines], "total": self.total, "hash": self.hash})
+        return json.dumps(
+            {"lines": [asdict(ln) for ln in self.lines], "total": self.total, "item_total": self.item_total,
+             "hash": self.hash}
+        )
+
+    @property
+    def extra_charges(self) -> float | None:
+        if self.total is None or self.item_total is None:
+            return None
+        return round(self.total - self.item_total, 2)
 
 
 def _to_float(value: Any) -> float | None:
@@ -52,6 +62,13 @@ def _to_float(value: Any) -> float | None:
         return float(str(value).replace("₹", "").replace(",", "").strip())
     except (TypeError, ValueError):
         return None
+
+
+def parse_item_total(cart: dict[str, Any]) -> float | None:
+    for line in (cart.get("billBreakdown") or {}).get("lineItems") or []:
+        if str(line.get("label", "")).strip().lower() == "item total":
+            return _to_float(line.get("value"))
+    return None
 
 
 def parse_total(cart: dict[str, Any]) -> float | None:
@@ -97,4 +114,4 @@ async def write_cart(sw: SwiggyCart, address_id: str, items: list[CartItem]) -> 
         ]
     else:
         lines = [SnapshotLine(i.spin_id, i.name, i.quantity, i.price) for i in items]
-    return CartSnapshot(lines=lines, total=parse_total(cart), raw_cart=cart)
+    return CartSnapshot(lines=lines, total=parse_total(cart), raw_cart=cart, item_total=parse_item_total(cart))

@@ -101,10 +101,17 @@ class FakeSwiggy:
             price = v["price"]["offerPrice"]
             total += price * line["quantity"]
             items.append({"spinId": v["spinId"], "name": v["displayName"], "quantity": line["quantity"], "price": price})
+        fees = 30 if items else 0  # like the real cart: item total + delivery/handling/GST lines
         data = {
             "cartTotalAmount": str(total),
             "items": items,
-            "billBreakdown": {"toPay": {"label": "To Pay", "value": str(total)}},
+            "billBreakdown": {
+                "lineItems": [
+                    {"label": "Item Total", "value": f"₹{total:.2f}"},
+                    {"label": "Delivery Partner Fee", "value": f"₹{fees:.2f}"},
+                ],
+                "toPay": {"label": "To Pay", "value": f"₹{total + fees}"},
+            },
             "cartAbsent": not items,
         }
         return self._wrap("Your Instamart cart." if items else "Your Instamart cart is empty.", data)

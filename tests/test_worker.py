@@ -68,7 +68,9 @@ async def test_request_writes_cart_and_reads_back(env):
     turns.append(cart_turns())
     assert await handle_inbound(deps, job(store, "do packet doodh")) == "readback"
     assert sw.cart == [{"spinId": "SPIN_MILK_500", "skuId": "SKU_MILK_500", "quantity": 2}]
-    assert "2 x Amul Taaza 500 ml – ₹56" in sent[-1] and "Kul: ₹56" in sent[-1] and "haan" in sent[-1]
+    msg = sent[-1]
+    assert "2 x Amul Taaza 500 ml – ₹56" in msg and "haan" in msg
+    assert "Saaman: ₹56" in msg and "Delivery, handling aur GST: ₹30" in msg and "Kul: ₹86" in msg
     assert store.open_draft("mom")["state"] == "AWAITING_PARENT"
     assert "checkout" not in called(sw)
 
@@ -133,3 +135,17 @@ async def test_agent_failure_is_visible_to_mom(env):
     turns.append([ModelTurn(calls=[], text="refuse")])
     assert await handle_inbound(deps, job(store, "doodh")) == "agent_failed"
     assert sent == [MSG_TRY_LATER] and store.open_draft("mom") is None
+
+
+async def test_failed_readback_leaves_no_draft_waiting(env):
+    deps, store, _sw, _sent, turns = env
+    turns.append(cart_turns())
+
+    async def broken(_text):
+        from maa.wa_send import NotifyError
+        raise NotifyError("131030 not in allowed list")
+
+    deps.send_to_mom = broken
+    with pytest.raises(Exception, match="131030"):
+        await handle_inbound(deps, job(store, "doodh"))
+    assert store.open_draft("mom") is None
