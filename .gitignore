@@ -9,6 +9,9 @@ __pycache__/
 .secrets/
 *.db
 *.db.bak
+*.db-wal
+*.db-shm
+*.db-journal
 
 # raw probe output contains real addresses/orders; sanitize before committing as fixtures
 probe_out/
