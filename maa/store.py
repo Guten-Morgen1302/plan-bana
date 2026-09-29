@@ -51,6 +51,17 @@ CREATE INDEX IF NOT EXISTS jobs_claim ON jobs (state, run_at, id);
 CREATE INDEX IF NOT EXISTS jobs_family ON jobs (family_id, state);
 CREATE INDEX IF NOT EXISTS jobs_draft ON jobs (draft_id, kind, state);
 
+CREATE TABLE IF NOT EXISTS drafts (
+    id          TEXT PRIMARY KEY,
+    family_id   TEXT NOT NULL,
+    state       TEXT NOT NULL,          -- AWAITING_PARENT | CHILD_APPROVAL_PENDING | CANCELLED | ...
+    transcript  TEXT,
+    snapshot    TEXT,                   -- CartSnapshot.to_json()
+    created_at  REAL NOT NULL,
+    updated_at  REAL NOT NULL
+);
+CREATE INDEX IF NOT EXISTS drafts_family ON drafts (family_id, state);
+
 CREATE TABLE IF NOT EXISTS inbound_messages (
     wamid        TEXT PRIMARY KEY,
     family_id    TEXT NOT NULL,
@@ -122,6 +133,42 @@ class Store:
         return self.conn.execute(
             "DELETE FROM inbound_messages WHERE state = 'completed' AND completed_at < ?", (now - keep_s,)
         ).rowcount
+
+    # ---------- drafts ----------
+
+    OPEN_DRAFT_STATES = ("AWAITING_PARENT", "CHILD_APPROVAL_PENDING", "PLACING", "NEEDS_REVIEW")
+
+    def create_draft(self, draft_id: str, family_id: str, state: str, transcript: str, snapshot: str, now: float) -> None:
+        self.conn.execute(
+            "INSERT INTO drafts (id, family_id, state, transcript, snapshot, created_at, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (draft_id, family_id, state, transcript, snapshot, now, now),
+        )
+
+    def open_draft(self, family_id: str) -> sqlite3.Row | None:
+        marks = ",".join("?" * len(self.OPEN_DRAFT_STATES))
+        return self.conn.execute(
+            f"SELECT * FROM drafts WHERE family_id = ? AND state IN ({marks}) ORDER BY created_at DESC LIMIT 1",
+            (family_id, *self.OPEN_DRAFT_STATES),
+        ).fetchone()
+
+    def set_draft_state(self, draft_id: str, expected: str, new: str, now: float) -> bool:
+        """Compare-and-set, so two handlers can't both move the same draft."""
+        cur = self.conn.execute(
+            "UPDATE drafts SET state = ?, updated_at = ? WHERE id = ? AND state = ?", (new, now, draft_id, expected)
+        )
+        return cur.rowcount == 1
+
+    def cancel_open_drafts(self, family_id: str, now: float, states: tuple[str, ...] = ("AWAITING_PARENT",)) -> int:
+        marks = ",".join("?" * len(states))
+        return self.conn.execute(
+            f"UPDATE drafts SET state = 'CANCELLED', updated_at = ? WHERE family_id = ? AND state IN ({marks})",
+            (now, family_id, *states),
+        ).rowcount
+
+    def draft_state(self, draft_id: str) -> str | None:
+        row = self.conn.execute("SELECT state FROM drafts WHERE id = ?", (draft_id,)).fetchone()
+        return row["state"] if row else None
 
     # ---------- jobs ----------
 
