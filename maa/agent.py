@@ -17,20 +17,31 @@ Code, never the model, injects Mom's addressId, writes the cart, and places orde
 
 from __future__ import annotations
 
+import asyncio
 import json
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 MAX_STEPS = 8
 MAX_TOOL_RESULT_CHARS = 6000
+MAX_SEARCHES_PER_TURN = 6  # hard cap; the prompt asks for one search per item
 
 SYSTEM_PROMPT = """You help an Indian mother order groceries on Swiggy Instamart from a Hinglish voice note.
 You will get the transcript of what she said. Work out which items she wants and in what quantity.
 
 Rules:
-- First call your_go_to_items to see what she usually buys. Prefer those exact products and pack sizes.
-- For anything not in her usual items, call search_products with a short product query (e.g. "amul taaza milk").
+- Be fast: she is waiting for a reply. Call your_go_to_items and one search_products per item IN THE SAME
+  TURN (parallel calls). Search at most once per item; never re-search an item you already have results for.
+- Prefer her usual items (your_go_to_items) with the exact same product and pack size.
+- Otherwise use a short query of brand + product (e.g. "amul taaza milk", "brown bread").
 - Only choose variations that are in stock (isInStockAndAvailable true).
+- Indian household pack sizes: "packet"/"thaili" of milk means the standard 500 ml pouch (not a 200 ml tetra);
+  bread means a regular loaf (~400 g); eggs default to 6 pcs; atta default 5 kg; oil 1 L; sugar 1 kg.
+  Prefer the everyday pack over single-serve or bulk packs unless she said a size.
+- Never drop an item she asked for just because the usual pack is missing. Pick the closest available
+  option (same brand, other pack size; or same product, other brand) and say what you changed in `note`,
+  in short Hinglish (e.g. "Amul Taaza ka 500 ml nahi mila, 200 ml ke 2 pack daale").
+  Adjust quantity so the total amount is close to what she meant (2 x 200 ml ≈ one 500 ml packet is fine).
 - If she did not say a quantity, use 1.
 - If an item is genuinely ambiguous (e.g. several very different pack sizes and no usual item to go by),
   call ask_mom with ONE short Hinglish question offering at most 2 choices. Otherwise do not ask.
@@ -178,15 +189,54 @@ def _known_spin_ids(payload: Any) -> set[str]:
     return found
 
 
+def compact_products(data: Any) -> Any:
+    """Keep only what the model needs to pick a variation; drops images, ratings, badges, etc.
+    Cuts tool-result tokens several-fold, which is most of the agent's latency."""
+    if not isinstance(data, dict) or "products" not in data:
+        return data
+    out = []
+    for p in (data.get("products") or []) + (data.get("similarProducts") or [])[:5]:
+        variations = [
+            {
+                "spinId": v.get("spinId"),
+                "skuId": v.get("skuId"),
+                "size": v.get("quantityDescription"),
+                "price": (v.get("price") or {}).get("offerPrice"),
+                "inStock": v.get("isInStockAndAvailable"),
+            }
+            for v in p.get("variations") or []
+        ]
+        brand, name = p.get("brand") or "", p.get("displayName") or ""
+        label = name if name.lower().startswith(brand.lower()) else f"{brand} {name}".strip()
+        out.append({"product": label, "variations": variations})
+    return {"products": out}
+
+
 async def run_turn(model: Model, swiggy: SwiggyReader, address_id: str, transcript: str) -> AgentResult:
     log: list[str] = []
     seen_spins: set[str] = set()
+    cache: dict[tuple[str, str], dict[str, Any]] = {}  # same query twice -> no second Swiggy call
+    searches = 0
     turn = model.start(SYSTEM_PROMPT, f"Mom said: {transcript}", TOOL_SPECS)
+
+    async def read(name: str, args: dict[str, Any]) -> dict[str, Any]:
+        key = (name, args.get("query", "").lower())
+        if key not in cache:
+            res = await swiggy.call(name, args)
+            data = res.get("parsed")
+            seen_spins.update(_known_spin_ids(data))
+            if res.get("is_error"):
+                cache[key] = {"error": res.get("text", "")[:500]}
+            else:
+                body = json.dumps(compact_products(data), ensure_ascii=False) if data is not None else res.get("text", "")
+                cache[key] = {"result": body[:MAX_TOOL_RESULT_CHARS]}
+        return cache[key]
 
     for _ in range(MAX_STEPS):
         if not turn.calls:
             raise AgentOutputError(f"model stopped without a tool call: {turn.text[:200]!r}")
-        results: list[tuple[str, dict[str, Any]]] = []
+        results: list[tuple[str, Any]] = []
+        pending: list[tuple[int, str, dict[str, Any]]] = []  # read calls run concurrently below
         for call in turn.calls:
             log.append(call.name)
             if call.name not in ALLOWED_TOOLS:
@@ -210,15 +260,17 @@ async def run_turn(model: Model, swiggy: SwiggyReader, address_id: str, transcri
                 if not query:
                     results.append((call.name, {"error": "query is required"}))
                     continue
+                searches += 1
+                if searches > MAX_SEARCHES_PER_TURN:
+                    results.append((call.name, {"error": "search limit reached; propose_cart with what you have"}))
+                    continue
                 args["query"] = query[:256]
-            res = await swiggy.call(call.name, args)
-            data = res.get("parsed")
-            seen_spins |= _known_spin_ids(data)
-            if res.get("is_error"):
-                results.append((call.name, {"error": res.get("text", "")[:500]}))
-            else:
-                body = json.dumps(data, ensure_ascii=False) if data is not None else res.get("text", "")
-                results.append((call.name, {"result": body[:MAX_TOOL_RESULT_CHARS]}))
+            results.append((call.name, None))
+            pending.append((len(results) - 1, call.name, args))
+
+        fetched = await asyncio.gather(*(read(name, args) for _, name, args in pending))
+        for (idx, name, _), payload in zip(pending, fetched, strict=True):
+            results[idx] = (name, payload)
         turn = model.send_tool_results(results)
 
     raise AgentOutputError(f"no cart after {MAX_STEPS} steps")

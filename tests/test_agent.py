@@ -116,3 +116,48 @@ def test_only_safe_tools_are_offered():
     from maa.agent import TOOL_SPECS
 
     assert {t["name"] for t in TOOL_SPECS} == {"your_go_to_items", "search_products", "propose_cart", "ask_mom"}
+
+
+async def test_repeat_query_hits_swiggy_once_and_parallel_results_keep_order():
+    sw = FakeSwiggy(go_to=["milk"])
+    model = ScriptedModel([
+        calls(("your_go_to_items", {}), ("search_products", {"query": "bread"}), ("search_products", {"query": "Bread"})),
+        calls(("propose_cart", {"items": [MILK]})),
+    ])
+    await run_turn(model, sw, ADDR, "doodh aur bread")
+    assert [n for n, _ in sw.calls] == ["your_go_to_items", "search_products"]
+    assert [name for name, _ in model.received[0]] == ["your_go_to_items", "search_products", "search_products"]
+    assert model.received[0][1] == model.received[0][2]
+
+
+async def test_search_cap_returns_error_instead_of_calling_swiggy():
+    from maa.agent import MAX_SEARCHES_PER_TURN
+
+    sw = FakeSwiggy()
+    many = [("search_products", {"query": f"item {i}"}) for i in range(MAX_SEARCHES_PER_TURN + 2)]
+    model = ScriptedModel([
+        calls(*many),
+        calls(("ask_mom", {"question": "Kya chahiye?"})),
+    ])
+    await run_turn(model, sw, ADDR, "sab kuch")
+    assert len(sw.calls) == MAX_SEARCHES_PER_TURN
+    assert "search limit" in model.received[0][-1][1]["error"]
+
+
+def test_compact_products_keeps_ids_and_drops_noise():
+    from maa.agent import compact_products
+
+    data = {
+        "products": [{
+            "brand": "Amul", "displayName": "Amul Taaza", "badges": [1],
+            "variations": [{"spinId": "S", "skuId": "K", "quantityDescription": "500 ml",
+                            "price": {"mrp": 30, "offerPrice": 28}, "isInStockAndAvailable": True,
+                            "imageUrl": "http://x", "rating": {"value": "4.6"}}],
+        }],
+        "similarProducts": [],
+    }
+    assert compact_products(data) == {"products": [{
+        "product": "Amul Taaza",
+        "variations": [{"spinId": "S", "skuId": "K", "size": "500 ml", "price": 28, "inStock": True}],
+    }]}
+    assert compact_products({"cartAbsent": True}) == {"cartAbsent": True}
