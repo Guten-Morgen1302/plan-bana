@@ -199,3 +199,34 @@ async def test_network_error_during_checkout_needs_review_not_retry(env):
     await to_child_approval(deps, store)
     _, result, draft = await press(deps, store, tg)
     assert result == "needs_review" and store.draft_state(draft["id"]) == "NEEDS_REVIEW" and len(sw.orders) == 1
+
+
+async def test_cod_unavailable_blocks_order(env):
+    deps, store, sw, tg, _mom = env
+    sw.order_exc = None
+    sw.cod_available = False
+    await bind(deps, store)
+    await to_child_approval(deps, store)
+    _, result, draft = await press(deps, store, tg)
+    assert result == "cod_unavailable" and sw.orders == []
+    assert store.draft_state(draft["id"]) == "CANCELLED" and "Cash on Delivery" in tg.edits[-1]
+
+
+async def test_checkout_is_always_cash(env):
+    deps, store, sw, tg, _ = env
+    sw.order_exc = None
+    await bind(deps, store)
+    await to_child_approval(deps, store)
+    await press(deps, store, tg)
+    assert sw.orders == [("checkout", {"addressId": ADDR, "paymentMethod": "Cash"})]
+
+
+async def test_partial_or_pending_payment_reply_needs_review(env):
+    deps, store, sw, tg, mom = env
+    sw.order_exc = None
+    sw.order_result = {"is_error": False, "text": "Order created, status PENDING_PAYMENT", "parsed": None}
+    await bind(deps, store)
+    await to_child_approval(deps, store)
+    _, result, draft = await press(deps, store, tg)
+    assert result == "needs_review" and store.draft_state(draft["id"]) == "NEEDS_REVIEW"
+    assert "zyada mat dena" not in mom[-1]

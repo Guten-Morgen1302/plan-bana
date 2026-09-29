@@ -89,6 +89,12 @@ class FakeSwiggy:
         self.cart = [dict(i) for i in args.get("items", [])]  # replaces the whole cart, like the real server
         return self._get_cart({})
 
+    cod_available = True
+
+    def _get_payment_options(self, args):
+        data = {"cod": {"available": self.cod_available, "id": "COD"}, "allMethods": [{"id": "COD"}]}
+        return self._wrap("Payment options.", data)
+
     def _clear_cart(self, args):
         self.cart = []
         return self._wrap("Cart cleared.", {"cartAbsent": True, "items": []})

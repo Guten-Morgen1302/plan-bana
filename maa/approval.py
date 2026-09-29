@@ -160,6 +160,16 @@ async def handle_child_action(deps, job: Job) -> str:
             await deps.send_to_mom("Cart mein kuch badal gaya hai (stock ya daam). Ek baar phir bata dijiye kya chahiye 🙏")
             return "cart_changed"
 
+        # COD only. Re-check right before ordering that Swiggy offers cash for THIS cart;
+        # otherwise never order (checkout would reject or fall back to another method).
+        opts = await sw.call("get_payment_options", {})
+        cod = ((opts.get("parsed") or {}).get("cod") or {}) if not opts.get("is_error") else {}
+        if not cod.get("available"):
+            store.set_draft_state(draft["id"], "CHILD_APPROVAL_PENDING", "CANCELLED", now)
+            await tell_child("⚠️ Swiggy is not offering Cash on Delivery for this cart right now. Nothing ordered.")
+            await deps.send_to_mom("Abhi cash on delivery nahi mil raha, order nahi gaya. Harsh dekh rahe hain 🙏")
+            return "cod_unavailable"
+
         if not store.set_draft_state(draft["id"], "CHILD_APPROVAL_PENDING", "PLACING", now):
             return "raced"
         try:
@@ -178,15 +188,24 @@ async def handle_child_action(deps, job: Job) -> str:
             await deps.send_to_mom("Thoda ruko, confirm kar rahe hain 🙏")
             return "needs_review"
 
+    store.set_setting(f"checkout_response:{draft['id']}", (res.get("text") or "")[:20000])  # for review
     if res.get("is_error"):
         store.set_draft_state(draft["id"], "PLACING", "FAILED", now)
         await tell_child(f"❌ Swiggy refused the order: {res.get('text', '')[:300]}")
         await deps.send_to_mom("Order nahi ja paya, Harsh dekh rahe hain 🙏")
         return "failed"
 
+    text = (res.get("text") or "").lower()
+    if "pending_payment" in text or "partial" in text:
+        # Not a clean COD placement (multi-store partial success, or a payment step): a human checks.
+        store.set_draft_state(draft["id"], "PLACING", "NEEDS_REVIEW", now)
+        await tell_child(f"⚠️ Swiggy's reply needs a look before we tell Maa:\n{res.get('text', '')[:600]}")
+        await deps.send_to_mom("Thoda ruko, confirm kar rahe hain 🙏")
+        return "needs_review"
+
     store.set_draft_state(draft["id"], "PLACING", "PLACED", now)
     total = live.total
-    await tell_child(f"✅ Order placed (COD ₹{total:g}).")
+    await tell_child(f"✅ Order placed (COD ₹{total:g}).\nSwiggy: {res.get('text', '')[:300]}")
     await deps.send_to_mom(
         f"{deps.child_name} ne bhej diya! Delivery wale ko ₹{total:g} dena hai, isse zyada mat dena 🙏"
     )
