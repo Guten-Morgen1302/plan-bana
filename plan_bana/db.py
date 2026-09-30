@@ -230,13 +230,13 @@ class PlanDB:
     def open_round(self, chat_id: int) -> sqlite3.Row | None:
         marks = ",".join("?" * len(TERMINAL))
         return self.conn.execute(
-            f"SELECT * FROM plan_rounds WHERE chat_id = ? AND state NOT IN ({marks}) ORDER BY created_at DESC LIMIT 1",
+            f"SELECT * FROM plan_rounds WHERE chat_id = ? AND state NOT IN ({marks}) ORDER BY created_at DESC, rowid DESC LIMIT 1",
             (chat_id, *sorted(TERMINAL)),
         ).fetchone()
 
     def last_round(self, chat_id: int) -> sqlite3.Row | None:
         return self.conn.execute(
-            "SELECT * FROM plan_rounds WHERE chat_id = ? ORDER BY created_at DESC LIMIT 1", (chat_id,)
+            "SELECT * FROM plan_rounds WHERE chat_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 1", (chat_id,)
         ).fetchone()
 
     def cas_state(self, rid: str, expected: str | tuple[str, ...], new: str, now: float, **fields: Any) -> bool:
