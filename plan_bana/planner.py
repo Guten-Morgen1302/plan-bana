@@ -19,7 +19,6 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from maa.llm import Model
 from plan_bana.checks import GAP_KNOWN_MIN, GAP_UNKNOWN_MIN, check_plan
 from plan_bana.corpus import (
     Corpus,
@@ -31,6 +30,7 @@ from plan_bana.corpus import (
     parse_slots,
     parse_suggestions,
 )
+from plan_bana.llm import Model
 from plan_bana.model import IST, Constraints, PlanOption
 
 MAX_PLANS = 3

@@ -24,15 +24,15 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from maa.auth import CredentialStore
-from maa.gemini import GeminiModel
-from maa.store import Store
-from maa.swiggy import connect, orders_enabled
+from plan_bana.auth import CredentialStore
 from plan_bana.bot import MessageRefresher, PlanTelegram
 from plan_bana.db import PlanDB
 from plan_bana.db import connect as connect_db
+from plan_bana.gemini import GeminiModel
 from plan_bana.planner import SwiggyAuthError
 from plan_bana.rounds import Deps, Rounds
+from plan_bana.store import Store
+from plan_bana.swiggy import connect, orders_enabled
 
 load_dotenv(ROOT / ".env")
 log = logging.getLogger("plan_bana")

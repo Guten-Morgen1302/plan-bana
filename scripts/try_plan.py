@@ -19,13 +19,13 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from maa.auth import CredentialStore
-from maa.gemini import GeminiModel
-from maa.swiggy import connect
 from plan_bana import copy
+from plan_bana.auth import CredentialStore
 from plan_bana.extract import Line, apply_default, extract_statements, reduce
+from plan_bana.gemini import GeminiModel
 from plan_bana.model import now_ist
 from plan_bana.planner import Planner
+from plan_bana.swiggy import connect
 
 load_dotenv(ROOT / ".env")
 

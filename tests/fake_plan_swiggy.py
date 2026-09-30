@@ -151,7 +151,7 @@ class _Reader:
         return await self.fake.handle(name, arguments or {})
 
     async def place_order(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
-        from maa.swiggy import OrderBlocked, orders_enabled
+        from plan_bana.swiggy import OrderBlocked, orders_enabled
         if not orders_enabled():
             raise OrderBlocked("DRY_RUN is on")
         self.fake.booked.append(arguments)

@@ -24,8 +24,8 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from maa.auth import CredentialStore, login
-from maa.swiggy import PLACE_ORDER_TOOLS, connect, orders_enabled
+from plan_bana.auth import CredentialStore, login
+from plan_bana.swiggy import PLACE_ORDER_TOOLS, connect, orders_enabled
 
 load_dotenv(ROOT / ".env")
 BASE_URL = os.getenv("SWIGGY_BASE_URL", "https://mcp.swiggy.com")

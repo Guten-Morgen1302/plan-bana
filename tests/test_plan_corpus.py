@@ -1,4 +1,4 @@
-"""Parsers against the REAL responses captured by scripts/probe_plan.py (tests/fixtures, sanitized)."""
+"""Parsers against REAL Scenes/Dineout responses captured live on 2026-09-30 (tests/fixtures, sanitized)."""
 
 import json
 from pathlib import Path

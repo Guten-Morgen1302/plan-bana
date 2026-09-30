@@ -33,7 +33,7 @@ def chat(*msgs: tuple[int, str]) -> list[Line]:
 
 
 def make_model():
-    from maa.gemini import GeminiModel
+    from plan_bana.gemini import GeminiModel
     return GeminiModel(os.environ["GEMINI_API_KEY"], os.getenv("GEMINI_MODEL", "gemini-3.8-flash"), temperature=0,
                        thinking_level=os.getenv("GEMINI_THINKING", "low") or None)
 

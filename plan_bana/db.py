@@ -1,4 +1,4 @@
-"""Plan Bana's SQLite tables, next to maa.store's jobs table in the same file (eng D1/E1: plan_bana.db).
+"""Plan Bana's SQLite tables, next to plan_bana.store's jobs table in the same file (eng D1/E1: plan_bana.db).
 
     chat_messages   rolling buffer of human text per group (24 h, max 50 rows per chat)
     group_settings  the group's area pin + whether the join notice went out
@@ -19,8 +19,8 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
-from maa.store import connect as connect_store
 from plan_bana.model import TERMINAL
+from plan_bana.store import connect as connect_store
 
 BUFFER_KEEP_S = 24 * 3600
 BUFFER_MAX_ROWS = 50

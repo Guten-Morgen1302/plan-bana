@@ -6,10 +6,10 @@ from pathlib import Path
 import httpx
 import pytest
 
-from maa.store import Store
-from maa.telegram import TelegramError
 from plan_bana.bot import MessageRefresher, PlanTelegram
 from plan_bana.db import connect
+from plan_bana.store import Store
+from plan_bana.telegram import TelegramError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 

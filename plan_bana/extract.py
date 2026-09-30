@@ -20,7 +20,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from maa.llm import AgentOutputError, Model
+from plan_bana.llm import AgentOutputError, Model
 from plan_bana.model import IST, WINDOWS, Constraints, Person
 
 FIELDS = ("date_ok", "date_no", "time_window", "budget", "veg", "genre", "not_coming", "headcount")

@@ -21,3 +21,4 @@ video/node_modules/
 video/out/
 video/public/clips/
 docs/demo/*.mp4
+!docs/media/*.mp4

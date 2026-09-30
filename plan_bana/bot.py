@@ -1,6 +1,6 @@
 """Telegram plumbing for Plan Bana: the client subclass (eng E5) and the single-flight message refresher (E7).
 
-PlanTelegram adds, on top of maa.telegram.TelegramBot (left untouched):
+PlanTelegram adds, on top of plan_bana.telegram.TelegramBot (the minimal base client):
   - HTML parse mode, inline keyboards on edit (empty list/None removes the keyboard), force_reply, pin
   - 429: wait retry_after once and retry; "message is not modified": ignored; anything else: TelegramError
 
@@ -19,7 +19,7 @@ import time
 from collections.abc import Awaitable, Callable
 from typing import Any
 
-from maa.telegram import TelegramBot, TelegramError
+from plan_bana.telegram import TelegramBot, TelegramError
 
 log = logging.getLogger("plan_bana.bot")
 

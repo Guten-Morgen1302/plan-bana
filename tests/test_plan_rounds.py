@@ -9,12 +9,12 @@ from contextlib import asynccontextmanager
 
 import pytest
 
-from maa.llm import ModelTurn, ToolCall
-from maa.store import Store
 from plan_bana import copy
 from plan_bana.bot import MessageRefresher
 from plan_bana.db import PlanDB, connect
+from plan_bana.llm import ModelTurn, ToolCall
 from plan_bana.rounds import IDLE_EXPIRE_S, Deps, Rounds
+from plan_bana.store import Store
 from tests.fake_plan_swiggy import ist, standard_world
 
 CHAT = -1001

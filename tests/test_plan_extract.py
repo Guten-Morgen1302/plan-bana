@@ -2,7 +2,6 @@ import datetime as dt
 
 import pytest
 
-from maa.llm import ModelTurn, ToolCall
 from plan_bana.extract import (
     ExtractError,
     Line,
@@ -13,6 +12,7 @@ from plan_bana.extract import (
     reduce,
     validate,
 )
+from plan_bana.llm import ModelTurn, ToolCall
 from plan_bana.model import IST, WINDOWS
 
 NOW = dt.datetime(2026, 9, 30, 18, 0, tzinfo=IST).timestamp()  # Wednesday

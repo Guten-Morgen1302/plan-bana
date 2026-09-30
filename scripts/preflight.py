@@ -22,11 +22,11 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from maa.auth import CredentialStore
-from maa.swiggy import connect, orders_enabled
+from plan_bana.auth import CredentialStore
 from plan_bana.corpus import haversine_km, parse_event_details, parse_shows, parse_suggestions
 from plan_bana.model import IST
 from plan_bana.planner import _day_bounds
+from plan_bana.swiggy import connect, orders_enabled
 
 load_dotenv(ROOT / ".env")
 OK, BAD, WARN = "✅", "❌", "⚠️"

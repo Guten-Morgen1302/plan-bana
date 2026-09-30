@@ -1,6 +1,6 @@
 import pytest
 
-from maa.store import Store, connect
+from plan_bana.store import Store, connect
 
 T0 = 1_000_000.0
 

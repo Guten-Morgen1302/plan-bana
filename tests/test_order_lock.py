@@ -2,7 +2,7 @@
 
 import pytest
 
-from maa.swiggy import PLACE_ORDER_TOOLS, OrderBlocked, SwiggySession, orders_enabled
+from plan_bana.swiggy import PLACE_ORDER_TOOLS, OrderBlocked, SwiggySession, orders_enabled
 
 
 class RecordingSession:

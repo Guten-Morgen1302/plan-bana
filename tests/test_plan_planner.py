@@ -3,8 +3,8 @@ import datetime as dt
 
 import pytest
 
-from maa.llm import ModelTurn, ToolCall
 from plan_bana.checks import check_plan, veg_friendly
+from plan_bana.llm import ModelTurn, ToolCall
 from plan_bana.model import WINDOWS, Constraints, Person
 from plan_bana.planner import Planner, SwiggyAuthError, recheck
 from tests.fake_plan_swiggy import FakeRestaurant, evening, ist, standard_world

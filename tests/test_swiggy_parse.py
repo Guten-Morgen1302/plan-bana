@@ -1,4 +1,4 @@
-from maa.swiggy import embedded_json
+from plan_bana.swiggy import embedded_json
 
 CART_TEXT = (
     "Your Instamart cart is empty. Add items with update_cart.\n\n"
@@ -38,7 +38,7 @@ def test_empty():
 def test_result_to_dict_reads_mcp2_snake_case_fields():
     import mcp.types as t
 
-    from maa.swiggy import result_to_dict
+    from plan_bana.swiggy import result_to_dict
 
     res = t.CallToolResult(
         content=[t.TextContent(type="text", text="boom")], is_error=True, structured_content={"a": 1}
@@ -50,7 +50,7 @@ def test_result_to_dict_reads_mcp2_snake_case_fields():
 def test_result_to_dict_ok_result_is_not_error():
     import mcp.types as t
 
-    from maa.swiggy import result_to_dict
+    from plan_bana.swiggy import result_to_dict
 
     out = result_to_dict(t.CallToolResult(content=[t.TextContent(type="text", text="ok")]))
     assert out["is_error"] is False and out["structured"] is None

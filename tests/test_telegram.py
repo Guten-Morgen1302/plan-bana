@@ -3,7 +3,7 @@ import json
 import httpx
 import pytest
 
-from maa.telegram import TelegramBot, TelegramError
+from plan_bana.telegram import TelegramBot, TelegramError
 
 
 def bot_with(handler):

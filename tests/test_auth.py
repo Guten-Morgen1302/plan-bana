@@ -8,7 +8,7 @@ from urllib.parse import parse_qs, urlparse
 
 import pytest
 
-from maa.auth import (
+from plan_bana.auth import (
     AuthError,
     CredentialStore,
     SwiggyCredentials,
