@@ -1,0 +1,185 @@
+{
+ "args": {
+  "eventId": "100116693",
+  "venueId": "1385"
+ },
+ "text": "Found 1 upcoming show(s) for the selected event.\nEvent ID: 100116693\nVenue ID: 1385\nAvailable shows:\n  - Wed, 30 Sept, 8:30 pm [showId: 100418702, showTime: 1790780400] — Tickets: Entry Pass For One [ticketId: 1074848], Entry Pass For Two [ticketId: 1074849]\nLocation context: latitude=19.1726, longitude=72.9565. Preserve these exact values for downstream Scenes calls.\n\nWhen the user selects a show and ticket, continue with event cart creation using the exact selection data returned by this tool.",
+ "structured": {
+  "eventShowListing": {
+   "dateSummary": [
+    {
+     "date": {
+      "year": 2026,
+      "month": 9,
+      "day": 30
+     },
+     "totalAvailableInventory": 20,
+     "status": "ENTITIES_DISCOVERY_STATE_ON_SALE"
+    }
+   ],
+   "venueDetails": [
+    {
+     "id": "1385",
+     "name": "Backspace Thane",
+     "description": "",
+     "location": {
+      "latLng": {
+       "latitude": 19.211753,
+       "longitude": 72.985027
+      },
+      "cityId": 5,
+      "zoneId": 0,
+      "poiIds": []
+     },
+     "address": "Backspace Thane, Sainath Nagar, Majiwada, Thane, Maharashtra, India",
+     "type": "VENUE_TYPE_SPECIFIC",
+     "auditoriums": [],
+     "distance": 4592.554298963498,
+     "cityDisplayName": "Mumbai",
+     "localityDisplayName": "Majiwada"
+    }
+   ],
+   "dateGroupedEventShow": [
+    {
+     "date": {
+      "year": 2026,
+      "month": 9,
+      "day": 30
+     },
+     "eventShow": [
+      {
+       "id": "100418702",
+       "name": "2026-09-30 15:00:00-2026-09-30 16:30:00",
+       "timeRange": {
+        "startTime": "2026-09-30T15:00:00Z",
+        "endTime": "2026-09-30T16:30:00Z"
+       },
+       "eventId": "100116693",
+       "venue": {
+        "type": "VENUE_TYPE_SPECIFIC",
+        "venueId": "1385",
+        "name": "",
+        "status": "STATE_INVALID",
+        "locality": ""
+       },
+       "auditoriumId": "",
+       "gatePreopenedAt": null,
+       "maxAvailableInventory": 20,
+       "tickets": [
+        {
+         "id": "1074848",
+         "name": "Entry Pass For One",
+         "availableInventory": 10,
+         "price": {
+          "price": {
+           "currencyCode": "INR",
+           "units": "249",
+           "nanos": 0
+          },
+          "discountedPrice": {
+           "currencyCode": "INR",
+           "units": "249",
+           "nanos": 0
+          },
+          "coverCharge": {
+           "currencyCode": "INR",
+           "units": "0",
+           "nanos": 0
+          }
+         },
+         "tnc": "<ul><li>This pass admits 1 individual only</li></ul>",
+         "status": "ENTITIES_DISCOVERY_STATE_ON_SALE"
+        },
+        {
+         "id": "1074849",
+         "name": "Entry Pass For Two",
+         "availableInventory": 10,
+         "price": {
+          "price": {
+           "currencyCode": "INR",
+           "units": "499",
+           "nanos": 0
+          },
+          "discountedPrice": {
+           "currencyCode": "INR",
+           "units": "499",
+           "nanos": 0
+          },
+          "coverCharge": {
+           "currencyCode": "INR",
+           "units": "0",
+           "nanos": 0
+          }
+         },
+         "tnc": "<ul><li>This pass admits 2 individuals only</li></ul>",
+         "status": "ENTITIES_DISCOVERY_STATE_ON_SALE"
+        }
+       ],
+       "purchaseRules": {
+        "allowedCovers": {
+         "min": 1,
+         "max": 10
+        },
+        "allowedType": "TICKET_PURCHASE_ALLOWED_MULTIPLE_VARIANTS"
+       },
+       "status": "ENTITIES_DISCOVERY_STATE_ON_SALE",
+       "show_time_unix": 1790780400,
+       "show_time_ist": "Wed, 30 Sept, 8:30 pm"
+      }
+     ]
+    }
+   ],
+   "eventInfo": {
+    "id": "100116693",
+    "name": "Comedy In Thane",
+    "description": "",
+    "timeRange": {
+     "startTime": "2026-09-02T15:00:00Z",
+     "endTime": "2026-09-30T16:30:00Z"
+    },
+    "eventCategory": {
+     "id": "",
+     "name": ""
+    },
+    "languages": [
+     "english",
+     "hindi"
+    ],
+    "ageGroup": "",
+    "eventDuration": {
+     "type": "TYPE_HOURS",
+     "value": 1
+    },
+    "seatingArrangement": "SEATING_ARRANGEMENT_SEATED",
+    "tags": [
+     "backspace 2026",
+     "comedy 07",
+     "comedy_07",
+     "Backspace_2026",
+     "Collection1_v2"
+    ],
+    "status": "ENTITIES_DISCOVERY_STATE_INVALID",
+    "ticketStartPrice": null,
+    "recurring": true,
+    "contacts": [],
+    "artists": [],
+    "tour": null,
+    "thingsToRemember": [],
+    "tnc": "",
+    "layout": "LAYOUT_INVALID",
+    "eventType": "EVENT_TYPE_INVALID",
+    "organizer": null,
+    "rewardsWidget": {
+     "title": "{{img|24|24|portal/static-assets/images/dineout/loyalty/Logo-Toggle.png}} Earn 10% DineCash on ticket booking",
+     "logo": "IMG"
+    }
+   }
+  },
+  "status": {
+   "code": 0,
+   "message": "Success",
+   "details": []
+  }
+ },
+ "is_error": false
+}

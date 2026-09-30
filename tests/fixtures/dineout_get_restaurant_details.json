@@ -1,0 +1,108 @@
+{
+ "args": {
+  "restaurantId": "864731"
+ },
+ "text": "Restaurant: Mad-Doh-Sourdough-Pizzeria-Bakes\nRestaurant ID: 864731\nCuisines: Italian, Middle Eastern\nAddress: 2 km • Sports Complex, Restaurant Kalidas, Purushottam Kheraj Road, Above Thyme & Whisk, Mulund West Near Kalidas Swimming Pool Central Suburbs 400080\nRating: 4.6\nCost for two: ₹1500 for two\nTimings: Open till 11:30PM\nCoordinates: latitude=19.1726, longitude=72.9565\nOffers: Flat 10% off on Total Bill\nAmenities / Highlights: Reservation available, Parking available, Free wifi, SwiggyPay accepted\n\nWhen the user wants to book a table or check availability, call get_available_slots with this restaurant's ID, the desired date (YYYY-MM-DD), and the same latitude/longitude. Do NOT call search_restaurants_dineout again.\n\n⚠️ A rich UI widget may be shown to the user with this data. Avoid restating everything the widget already displays — instead, provide a brief recommendation or ask what they'd like to do next.",
+ "structured": {
+  "restaurantId": "864731",
+  "restaurant": {
+   "id": "864731",
+   "restaurantId": "864731",
+   "name": "Mad-Doh-Sourdough-Pizzeria-Bakes",
+   "cuisines": [
+    "Italian",
+    "Middle Eastern"
+   ],
+   "locality": " Sports Complex, Mulund West, Mumbai",
+   "area": " Sports Complex, Mulund West, Mumbai",
+   "address": "2 km • Sports Complex, Restaurant Kalidas, Purushottam Kheraj Road, Above Thyme & Whisk, Mulund West Near Kalidas Swimming Pool Central Suburbs 400080",
+   "avgRating": 4.6,
+   "costForTwo": "₹1500 for two",
+   "imageUrl": "IMG",
+   "mastheadImageUrls": [
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG",
+    "IMG"
+   ],
+   "timings": "Open till 11:30PM",
+   "deals": [
+    {
+     "id": "",
+     "title": "Flat 10% off on Total Bill",
+     "description": "",
+     "discountPercentage": 10,
+     "coverCharge": 0,
+     "slotGroupName": "Pre-booking offers",
+     "offerCategory": "prebooking",
+     "adjoiningSubtext": "with 1 Month at just ₹1"
+    }
+   ],
+   "partnerType": "PR"
+  },
+  "offers": [
+   {
+    "id": "",
+    "title": "Flat 10% off on Total Bill",
+    "description": "",
+    "discountPercentage": 10,
+    "coverCharge": 0,
+    "slotGroupName": "Pre-booking offers",
+    "offerCategory": "prebooking",
+    "adjoiningSubtext": "with 1 Month at just ₹1"
+   }
+  ],
+  "menuImages": [
+   {
+    "imageUrl": "https://dineout-media-assets.swiggy.com/swiggy/image/upload/DINEOUT_ALL_RESTAURANTS/IMAGES/RESTAURANT_IMAGE_SERVICE/2024/4/1/06c72b30-0885-4f15-ae93-bf2b220839e1_20240401T123145341.jpg",
+    "label": "Page 1"
+   }
+  ],
+  "menuImageGroups": [
+   {
+    "title": "All • 1 page",
+    "images": [
+     {
+      "imageUrl": "https://dineout-media-assets.swiggy.com/swiggy/image/upload/DINEOUT_ALL_RESTAURANTS/IMAGES/RESTAURANT_IMAGE_SERVICE/2024/4/1/06c72b30-0885-4f15-ae93-bf2b220839e1_20240401T123145341.jpg",
+      "label": "Page 1"
+     }
+    ]
+   }
+  ],
+  "amenities": [
+   "Reservation available",
+   "Parking available",
+   "Free wifi",
+   "SwiggyPay accepted"
+  ],
+  "locationMapUrl": "https://www.google.com/maps/dir/?api=1&origin=19.1726,72.9565&destination=19.173358,72.947663&travelmode=driving",
+  "latitude": 19.1726,
+  "longitude": 72.9565
+ },
+ "is_error": false
+}

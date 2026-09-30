@@ -85,9 +85,16 @@ def result_to_dict(result: Any) -> dict[str, Any]:
     texts = [c.text for c in getattr(result, "content", []) or [] if getattr(c, "type", None) == "text"]
     text = "\n".join(texts)
     parsed = embedded_json(text)
+    # mcp>=2 names these is_error / structured_content; older SDKs used the camelCase wire names.
+    is_error = getattr(result, "is_error", None)
+    if is_error is None:
+        is_error = getattr(result, "isError", False)
+    structured = getattr(result, "structured_content", None)
+    if structured is None:
+        structured = getattr(result, "structuredContent", None)
     return {
-        "is_error": bool(getattr(result, "isError", False)),
-        "structured": getattr(result, "structuredContent", None),
+        "is_error": bool(is_error),
+        "structured": structured,
         "text": text,
         "parsed": parsed,
     }

@@ -1,0 +1,203 @@
+{
+ "args": {
+  "query": "music",
+  "latitude": 19.1726,
+  "longitude": 72.9565
+ },
+ "text": "Found 38 event(s) matching \"music\"\n1. Wednesday Midweek Live Music At Toast (eventId: 100096684) — Marol, Mumbai\n2. Sunday Brunch and Live Music at Glocal Andheri (eventId: 100113918) — Andheri Lokhandwala, Mumbai\n3. Live Music Featuring Baba Machine At Tap Chembur (eventId: 100124317) — Chembur, Mumbai\n4. Music Therapy 191 With Dr Ojas Joshi (eventId: 100118700) — Bandra East, Mumbai\n5. Live Music Feat Anish At Tap Worli (eventId: 100124320) — Worli, Mumbai\n6. Ft Tej Music Vodka At Clara (eventId: 100116835) — Vagator, Central Goa\n7. Live Music at Sea Pebbles (eventId: 100123314) — Dona Paula, Central Goa\n8. Retro Music Wednesdays Featuring Cidroy Paes At Bay 15 (eventId: 100114759) — Dona Paula, Central Goa\n9. Live Music at the Cape Goa Featuring Pradyumna and Rutvik (eventId: 100118605) — Cabo De Rama, Central Goa\n10. Thursday Sufi Night Music (eventId: 100123506) — Vijay Nagar, Indore\n11. Sunday Live Instrumental Music (eventId: 100123514) — Vijay Nagar, Indore\n12. Saturday Live Artist Music (eventId: 100123515) — Vijay Nagar, Indore\n13. Thursday Retro Music Night (eventId: 100123608) — Sarjapur Road, Bangalore\n14. Live Music (eventId: 100124425) — Surajpura, Jaipur\n15. Live Music (eventId: 100124382) — Shri Vihar, Jaipur\n16. Live Music (eventId: 100124402) — Kumba Marg, Jaipur\n17. Live Music (eventId: 100124420) — Karolan Ka Barh, Jaipur\n18. Live Music (eventId: 100124377) — Akshay Patra Temple, Jaipur\n19. Live Music (eventId: 100124421) — Pratap Nagar, Jaipur\n20. Live Music (eventId: 100124399) — Mansarovar Extension, Jaipur\n21. Live Music (eventId: 100124422) — Malviya Nagar, Jaipur\n22. Live Music (eventId: 100124430) — Mansarovar, Jaipur\n23. Live Music (eventId: 100124396) — Vaibhav Enclave, Plot No. 11/01 Girdhar Marg, Jaipur\n24. Live Music (eventId: 100124386) — Malviya Nagar, Jaipur\n25. Sunday Live Music (eventId: 100124105) — Mansarovar, Jaipur\n26. Live Music (eventId: 100124388) — Shivanand, Jaipur\n27. Live Music (eventId: 100124423) — Mansarovar, Jaipur\n28. Live Music (eventId: 100124429) — Manasarovar, Jaipur\n29. Live Music (eventId: 100124418) — Manasarovar, Jaipur\n30. Live Music (eventId: 100124376) — Lalarpura, Jaipur\n31. Live Music (eventId: 100124416) — Chitrakoot, Jaipur\n32. Live Music (eventId: 100124385) — Vaishali Nagar, Jaipur\n33. Live Music (eventId: 100124389) — Chitrakoot, Jaipur\n34. Live Music (eventId: 100124404) — Lalkothi, Jaipur\n35. Live Music (eventId: 100124384) — Vaishali Nagar, Jaipur\n36. Live Music (eventId: 100124390) — Vaishali Nagar, Jaipur\n37. Live Music (eventId: 100124391) — E Block, Jaipur\n38. Live Music (eventId: 100124424) — Shivraj Niketan Colony, Jaipur\nLocation context: latitude=19.1726, longitude=72.9565. Preserve these exact values for downstream Scenes calls.\n\nWhen the user selects an event, continue with its event details.",
+ "structured": {
+  "suggestions": [
+   {
+    "eventId": "100096684",
+    "eventName": "Wednesday Midweek Live Music At Toast",
+    "location": "Marol, Mumbai"
+   },
+   {
+    "eventId": "100113918",
+    "eventName": "Sunday Brunch and Live Music at Glocal Andheri",
+    "location": "Andheri Lokhandwala, Mumbai"
+   },
+   {
+    "eventId": "100124317",
+    "eventName": "Live Music Featuring Baba Machine At Tap Chembur",
+    "location": "Chembur, Mumbai"
+   },
+   {
+    "eventId": "100118700",
+    "eventName": "Music Therapy 191 With Dr Ojas Joshi",
+    "location": "Bandra East, Mumbai"
+   },
+   {
+    "eventId": "100124320",
+    "eventName": "Live Music Feat Anish At Tap Worli",
+    "location": "Worli, Mumbai"
+   },
+   {
+    "eventId": "100116835",
+    "eventName": "Ft Tej Music Vodka At Clara",
+    "location": "Vagator, Central Goa"
+   },
+   {
+    "eventId": "100123314",
+    "eventName": "Live Music at Sea Pebbles",
+    "location": "Dona Paula, Central Goa"
+   },
+   {
+    "eventId": "100114759",
+    "eventName": "Retro Music Wednesdays Featuring Cidroy Paes At Bay 15",
+    "location": "Dona Paula, Central Goa"
+   },
+   {
+    "eventId": "100118605",
+    "eventName": "Live Music at the Cape Goa Featuring Pradyumna and Rutvik",
+    "location": "Cabo De Rama, Central Goa"
+   },
+   {
+    "eventId": "100123506",
+    "eventName": "Thursday Sufi Night Music",
+    "location": "Vijay Nagar, Indore"
+   },
+   {
+    "eventId": "100123514",
+    "eventName": "Sunday Live Instrumental Music",
+    "location": "Vijay Nagar, Indore"
+   },
+   {
+    "eventId": "100123515",
+    "eventName": "Saturday Live Artist Music",
+    "location": "Vijay Nagar, Indore"
+   },
+   {
+    "eventId": "100123608",
+    "eventName": "Thursday Retro Music Night",
+    "location": "Sarjapur Road, Bangalore"
+   },
+   {
+    "eventId": "100124425",
+    "eventName": "Live Music",
+    "location": "Surajpura, Jaipur"
+   },
+   {
+    "eventId": "100124382",
+    "eventName": "Live Music",
+    "location": "Shri Vihar, Jaipur"
+   },
+   {
+    "eventId": "100124402",
+    "eventName": "Live Music",
+    "location": "Kumba Marg, Jaipur"
+   },
+   {
+    "eventId": "100124420",
+    "eventName": "Live Music",
+    "location": "Karolan Ka Barh, Jaipur"
+   },
+   {
+    "eventId": "100124377",
+    "eventName": "Live Music",
+    "location": "Akshay Patra Temple, Jaipur"
+   },
+   {
+    "eventId": "100124421",
+    "eventName": "Live Music",
+    "location": "Pratap Nagar, Jaipur"
+   },
+   {
+    "eventId": "100124399",
+    "eventName": "Live Music",
+    "location": "Mansarovar Extension, Jaipur"
+   },
+   {
+    "eventId": "100124422",
+    "eventName": "Live Music",
+    "location": "Malviya Nagar, Jaipur"
+   },
+   {
+    "eventId": "100124430",
+    "eventName": "Live Music",
+    "location": "Mansarovar, Jaipur"
+   },
+   {
+    "eventId": "100124396",
+    "eventName": "Live Music",
+    "location": "Vaibhav Enclave, Plot No. 11/01 Girdhar Marg, Jaipur"
+   },
+   {
+    "eventId": "100124386",
+    "eventName": "Live Music",
+    "location": "Malviya Nagar, Jaipur"
+   },
+   {
+    "eventId": "100124105",
+    "eventName": "Sunday Live Music",
+    "location": "Mansarovar, Jaipur"
+   },
+   {
+    "eventId": "100124388",
+    "eventName": "Live Music",
+    "location": "Shivanand, Jaipur"
+   },
+   {
+    "eventId": "100124423",
+    "eventName": "Live Music",
+    "location": "Mansarovar, Jaipur"
+   },
+   {
+    "eventId": "100124429",
+    "eventName": "Live Music",
+    "location": "Manasarovar, Jaipur"
+   },
+   {
+    "eventId": "100124418",
+    "eventName": "Live Music",
+    "location": "Manasarovar, Jaipur"
+   },
+   {
+    "eventId": "100124376",
+    "eventName": "Live Music",
+    "location": "Lalarpura, Jaipur"
+   },
+   {
+    "eventId": "100124416",
+    "eventName": "Live Music",
+    "location": "Chitrakoot, Jaipur"
+   },
+   {
+    "eventId": "100124385",
+    "eventName": "Live Music",
+    "location": "Vaishali Nagar, Jaipur"
+   },
+   {
+    "eventId": "100124389",
+    "eventName": "Live Music",
+    "location": "Chitrakoot, Jaipur"
+   },
+   {
+    "eventId": "100124404",
+    "eventName": "Live Music",
+    "location": "Lalkothi, Jaipur"
+   },
+   {
+    "eventId": "100124384",
+    "eventName": "Live Music",
+    "location": "Vaishali Nagar, Jaipur"
+   },
+   {
+    "eventId": "100124390",
+    "eventName": "Live Music",
+    "location": "Vaishali Nagar, Jaipur"
+   },
+   {
+    "eventId": "100124391",
+    "eventName": "Live Music",
+    "location": "E Block, Jaipur"
+   },
+   {
+    "eventId": "100124424",
+    "eventName": "Live Music",
+    "location": "Shivraj Niketan Colony, Jaipur"
+   }
+  ]
+ },
+ "is_error": false
+}

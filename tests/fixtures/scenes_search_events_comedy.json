@@ -1,0 +1,208 @@
+{
+ "args": {
+  "query": "comedy",
+  "latitude": 19.1726,
+  "longitude": 72.9565
+ },
+ "text": "Found 39 event(s) matching \"comedy\"\n1. Comedy In Thane (eventId: 100116693) — Majiwada, Mumbai\n2. Comedy Cartel At Glocal (eventId: 100122867) — Andheri Lokhandwala, Mumbai\n3. Are You Wet Standup Comedy Show By Ink A Laugh (eventId: 100104136) — Vile Parle West, Mumbai\n4. Dubai Return Standup Comedy Show At Ink A Laugh (eventId: 100104168) — Vile Parle West, Mumbai\n5. Monsoon Special Standup Comedy Show By Ink A Laugh (eventId: 100104138) — Vile Parle West, Mumbai\n6. Drop Out Stand-Up Comedy Show At Ink A Laugh (eventId: 100104157) — Vile Parle West, Mumbai\n7. Hate My Job Standup Comedy Show Presented By Ink A Laugh (eventId: 100101119) — Vile Parle West, Mumbai\n8. Crowd Confessions Standup Comedy Show At Ink A Laugh (eventId: 100104171) — Vile Parle West, Mumbai\n9. Controversial Comedy at Ink a Laugh (eventId: 100104150) — Vile Parle West, Mumbai\n10. Laughter Therapy Comedy Wheel at Dorangos (eventId: 100095918) — Bandra West, Mumbai\n11. Akshay Srivastava Live At Vintage Comedy Club Pune (eventId: 100114197) — Hinjawadi, Pune\n12. Kharadi Comedy Nights Stand Up Comedy (eventId: 100121119) — Kharadi, Pune\n13. Slack Friday Stand-Up Comedy Special (eventId: 100119054) — Kharadi, Pune\n14. Kharadi Late Nights Stand-Up Comedy (eventId: 100119053) — Kharadi, Pune\n15. Spam Comedy Presents Sexy Jokes (eventId: 100118272) — Madhapur, Hyderabad\n16. Mechanical Si Zindagi A Stand Up Comedy Show By Vaibhav Arora (eventId: 100124588) — Bangalore, Bangalore\n17. The Narcissist - Standup Comedy Show (eventId: 100124925) — Ashok Nagar, Bangalore\n18. Pitcher of Jokes Comedy Show at Indiranagar (eventId: 100124934) — Indiranagar, Bangalore\n19. Air 1 Standup Comedy By Harshit Mahawar (eventId: 100098766) — Khb Colony, Bangalore\n20. Let Me Try A Stand-Up Comedy Solo Show By Ashish Gupta (eventId: 100121249) — Sector 43, Gurgaon\n21. Noc Exclusive Stand Up Comedy Lineup Show (eventId: 100123443) — Sector 43, Gurgaon\n22. NOC Exclusive Stand-Up Comedy Lineup Show (eventId: 100124065) — Sector 43, Gurgaon\n23. Shikha Chauhan Live - A Stand-Up Comedy Solo Show (eventId: 100124095) — Sector 43, Gurgaon\n24. Noc Exclusive Stand-Up Comedy Lineup Show (eventId: 100120358) — Sector 43, Gurgaon\n25. Appurv Gupta And Friends A Stand-Up Comedy Show (eventId: 100123089) — Sector 43, Gurgaon\n26. Super 8 A Stand-Up Comedy Lineup Show (eventId: 100122775) — Sector 43, Gurgaon\n27. Noc Exclusive Stand Up Comedy Lineup Show (eventId: 100122826) — Sector 43, Gurgaon\n28. Noc Exclusive Stand-Up Comedy Lineup Show (eventId: 100124067) — Sector 43, Gurgaon\n29. Anurag Singh Live A Stand Up Comedy Solo Show (eventId: 100122828) — Sector 43, Gurgaon\n30. Noc Exclusive Stand-Up Comedy Line Up Show (eventId: 100122770) — Sector 43, Gurgaon\n31. Hot And Hilarious A Stand Up Comedy Line Up Show (eventId: 100118055) — Sector 43, Gurgaon\n32. Two Of A Kind: Comedy Show Ft. Trisha And Tushar (eventId: 100122218) — Sector 43, Gurgaon\n33. The Late Night Comedy Show (eventId: 100115924) — Dlf Phase - 2, Gurgaon\n34. Saurabh Rawat Live Standup Comedy Show (eventId: 100118035) — Saket, Delhi\n35. Late Night StandUp Comedy Show (eventId: 100117513) — Hauz Khas, Delhi\n36. All Star Comedy Lineup Show (eventId: 100117517) — Hauz Khas, Delhi\n37. Dirty Mind A Line Up Comedy Show (eventId: 100117797) — Hauz Khas, Delhi\n38. Mid Night Stand Up Comedy Show (eventId: 100117515) — Hauz Khas, Delhi\n39. Dark Jokes A Dark Jokes Comedy Show (eventId: 100117796) — Hauz Khas, Delhi\nLocation context: latitude=19.1726, longitude=72.9565. Preserve these exact values for downstream Scenes calls.\n\nWhen the user selects an event, continue with its event details.",
+ "structured": {
+  "suggestions": [
+   {
+    "eventId": "100116693",
+    "eventName": "Comedy In Thane",
+    "location": "Majiwada, Mumbai"
+   },
+   {
+    "eventId": "100122867",
+    "eventName": "Comedy Cartel At Glocal",
+    "location": "Andheri Lokhandwala, Mumbai"
+   },
+   {
+    "eventId": "100104136",
+    "eventName": "Are You Wet Standup Comedy Show By Ink A Laugh",
+    "location": "Vile Parle West, Mumbai"
+   },
+   {
+    "eventId": "100104168",
+    "eventName": "Dubai Return Standup Comedy Show At Ink A Laugh",
+    "location": "Vile Parle West, Mumbai"
+   },
+   {
+    "eventId": "100104138",
+    "eventName": "Monsoon Special Standup Comedy Show By Ink A Laugh",
+    "location": "Vile Parle West, Mumbai"
+   },
+   {
+    "eventId": "100104157",
+    "eventName": "Drop Out Stand-Up Comedy Show At Ink A Laugh",
+    "location": "Vile Parle West, Mumbai"
+   },
+   {
+    "eventId": "100101119",
+    "eventName": "Hate My Job Standup Comedy Show Presented By Ink A Laugh",
+    "location": "Vile Parle West, Mumbai"
+   },
+   {
+    "eventId": "100104171",
+    "eventName": "Crowd Confessions Standup Comedy Show At Ink A Laugh",
+    "location": "Vile Parle West, Mumbai"
+   },
+   {
+    "eventId": "100104150",
+    "eventName": "Controversial Comedy at Ink a Laugh",
+    "location": "Vile Parle West, Mumbai"
+   },
+   {
+    "eventId": "100095918",
+    "eventName": "Laughter Therapy Comedy Wheel at Dorangos",
+    "location": "Bandra West, Mumbai"
+   },
+   {
+    "eventId": "100114197",
+    "eventName": "Akshay Srivastava Live At Vintage Comedy Club Pune",
+    "location": "Hinjawadi, Pune"
+   },
+   {
+    "eventId": "100121119",
+    "eventName": "Kharadi Comedy Nights Stand Up Comedy",
+    "location": "Kharadi, Pune"
+   },
+   {
+    "eventId": "100119054",
+    "eventName": "Slack Friday Stand-Up Comedy Special",
+    "location": "Kharadi, Pune"
+   },
+   {
+    "eventId": "100119053",
+    "eventName": "Kharadi Late Nights Stand-Up Comedy",
+    "location": "Kharadi, Pune"
+   },
+   {
+    "eventId": "100118272",
+    "eventName": "Spam Comedy Presents Sexy Jokes",
+    "location": "Madhapur, Hyderabad"
+   },
+   {
+    "eventId": "100124588",
+    "eventName": "Mechanical Si Zindagi A Stand Up Comedy Show By Vaibhav Arora",
+    "location": "Bangalore, Bangalore"
+   },
+   {
+    "eventId": "100124925",
+    "eventName": "The Narcissist - Standup Comedy Show",
+    "location": "Ashok Nagar, Bangalore"
+   },
+   {
+    "eventId": "100124934",
+    "eventName": "Pitcher of Jokes Comedy Show at Indiranagar",
+    "location": "Indiranagar, Bangalore"
+   },
+   {
+    "eventId": "100098766",
+    "eventName": "Air 1 Standup Comedy By Harshit Mahawar",
+    "location": "Khb Colony, Bangalore"
+   },
+   {
+    "eventId": "100121249",
+    "eventName": "Let Me Try A Stand-Up Comedy Solo Show By Ashish Gupta",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100123443",
+    "eventName": "Noc Exclusive Stand Up Comedy Lineup Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100124065",
+    "eventName": "NOC Exclusive Stand-Up Comedy Lineup Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100124095",
+    "eventName": "Shikha Chauhan Live - A Stand-Up Comedy Solo Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100120358",
+    "eventName": "Noc Exclusive Stand-Up Comedy Lineup Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100123089",
+    "eventName": "Appurv Gupta And Friends A Stand-Up Comedy Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100122775",
+    "eventName": "Super 8 A Stand-Up Comedy Lineup Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100122826",
+    "eventName": "Noc Exclusive Stand Up Comedy Lineup Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100124067",
+    "eventName": "Noc Exclusive Stand-Up Comedy Lineup Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100122828",
+    "eventName": "Anurag Singh Live A Stand Up Comedy Solo Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100122770",
+    "eventName": "Noc Exclusive Stand-Up Comedy Line Up Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100118055",
+    "eventName": "Hot And Hilarious A Stand Up Comedy Line Up Show",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100122218",
+    "eventName": "Two Of A Kind: Comedy Show Ft. Trisha And Tushar",
+    "location": "Sector 43, Gurgaon"
+   },
+   {
+    "eventId": "100115924",
+    "eventName": "The Late Night Comedy Show",
+    "location": "Dlf Phase - 2, Gurgaon"
+   },
+   {
+    "eventId": "100118035",
+    "eventName": "Saurabh Rawat Live Standup Comedy Show",
+    "location": "Saket, Delhi"
+   },
+   {
+    "eventId": "100117513",
+    "eventName": "Late Night StandUp Comedy Show",
+    "location": "Hauz Khas, Delhi"
+   },
+   {
+    "eventId": "100117517",
+    "eventName": "All Star Comedy Lineup Show",
+    "location": "Hauz Khas, Delhi"
+   },
+   {
+    "eventId": "100117797",
+    "eventName": "Dirty Mind A Line Up Comedy Show",
+    "location": "Hauz Khas, Delhi"
+   },
+   {
+    "eventId": "100117515",
+    "eventName": "Mid Night Stand Up Comedy Show",
+    "location": "Hauz Khas, Delhi"
+   },
+   {
+    "eventId": "100117796",
+    "eventName": "Dark Jokes A Dark Jokes Comedy Show",
+    "location": "Hauz Khas, Delhi"
+   }
+  ]
+ },
+ "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+ "args": {
+  "query": "Italian",
+  "latitude": 19.1726,
+  "longitude": 72.9565
+ },
+ "text": "Found 28 restaurant(s) matching \"Italian\", showing 5. 23 more available, call again with offset=5.\n1. 1441 Pizzeria — American, Italian | 4.2★ | ₹1000 for two | Majiwada (ID: 708583)\n2. Siciliana — European, Italian | 4.1★ | ₹2000 for two | Thane West (ID: 1220690)\n3. Mad-Doh-Sourdough-Pizzeria-Bakes — Italian, Middle Eastern | 4.6★ | ₹1500 for two | Mulund West (ID: 864731)\n4. Cottage Fine Dine — Chinese, North Indian | 4.0★ | ₹1000 for two | Pawar Nagar (ID: 39735)\n5. Friends' Caffe — Italian, Sandwich | 4.6★ | ₹499 for two | Thane Panchpakhadi (ID: 1275084)\nSearch coordinates: latitude=19.1726, longitude=72.9565 (use these for get_restaurant_details and downstream calls).\n\nWhen the user selects a restaurant (by name, number, or clicking), call get_restaurant_details with that restaurant's ID and the same latitude/longitude. Do NOT call search_restaurants_dineout again.\n\nThese results are NOT yet shown to the user. Decide which restaurants to show and in what order based on the user's intent (cheapest → cost, best → rating, nearest → distance, else relevance), then call render_restaurants_dineout with restaurantIds in that order plus searches listing every search you ran ({ query, latitude, longitude, entityType? }). ids may span multiple searches.",
+ "structured": {},
+ "is_error": false
+}

@@ -1,0 +1,12 @@
+{
+ "args": {
+  "latitude": 19.1726,
+  "longitude": 72.9565
+ },
+ "text": "No events found near the selected location.\nLocation context: latitude=19.1726, longitude=72.9565. Preserve these exact values for downstream Scenes calls.",
+ "structured": {
+  "events": [],
+  "collectionChips": []
+ },
+ "is_error": false
+}

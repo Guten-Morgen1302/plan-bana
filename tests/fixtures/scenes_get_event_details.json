@@ -1,0 +1,19 @@
+{
+ "args": {
+  "eventId": "100116693"
+ },
+ "text": "Event: Comedy In Thane\nEvent ID: 100116693\nVenue ID: 1385\nVenue: Backspace Thane\nArea: Majiwada\nAddress: Backspace Thane, Mumbai\nUpcoming: 30th Sep • 08:30 PM onwards\nLocation context: latitude=19.1726, longitude=72.9565. Preserve these exact values for downstream Scenes calls.\n\nWhen the user wants show timings, continue with the show listing for this event.",
+ "structured": {
+  "eventId": "100116693",
+  "eventName": "Comedy In Thane",
+  "venueId": "1385",
+  "venueName": "Backspace Thane",
+  "area": "Majiwada",
+  "formattedAddress": "Backspace Thane, Mumbai",
+  "venueLat": "19.211753",
+  "venueLng": "72.985027",
+  "upcomingDate": "30th Sep • 08:30 PM onwards",
+  "price": ""
+ },
+ "is_error": false
+}

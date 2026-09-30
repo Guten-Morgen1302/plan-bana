@@ -1083,6 +1083,29 @@ Re-review completion summary:
 
 Approval readiness: PASS (E6–E11 auto-approved per the user's instruction; E1–E5, D1–D6, CEO D1–D6 and design DR1–DR15 carried forward).
 
+## Probe Results (T1, 2026-09-30, read-only)
+
+Run with `python scripts/probe_plan.py` (Mulund pin). Sanitized copies are in `tests/fixtures/`.
+
+- **Open Q1, coverage:**
+  - `discover_events` returns `{"events": [], "collectionChips": []}` near Mulund, so genre browsing through chips is unavailable here.
+  - `search_events "comedy"` returns 39 suggestions **nationwide**, each shaped `{eventId, eventName, location}`. Mumbai ones include "Comedy In Thane" (Backspace, Majiwada, ~4.6 km), plus Andheri and Vile Parle.
+  - The planner filters by the venue's distance from the group pin (new check 0: venue ≤ 30 km, else dropped).
+- **Open Q2, show fields:**
+  - `get_event_details` → venueId, venueName, area, `venueLat`/`venueLng`, upcomingDate, price (may be "").
+  - `list_event_shows` → per show: `id` (showId), `timeRange.startTime`/`endTime` (UTC, **real end time**), `show_time_ist`, tickets with `price.units` (₹) and `availableInventory`; venue `distance` in metres.
+  - There's no shareable link. The fallback copy is "Swiggy app → Scenes → <event name>".
+- **Open Q3, Dineout fields:**
+  - Search returns **text only** (structured `{}`): `N. Name — cuisines | 4.2★ | ₹1000 for two | Area (ID: 708583)`.
+  - `get_restaurant_details` gives the structured `restaurant{cuisines, costForTwo "₹1500 for two", address "2 km • …"}`. That distance is measured from the search coordinates, so searching at the venue gives distance-to-venue.
+  - **No veg flag**, so the cuisine heuristic applies (check 5).
+- **Open Q4, slots/booking:**
+  - `get_available_slots(date)` text lists the first date's 15-minute slots as `HH:MM AM→<unix>`, plus `YYYY-MM-DD [FREE]: slotId=1, itemId="<rid>-<ticket>"`. Always call it with the plan date itself.
+  - `book_table` requires `guestCount` (1–20). No per-deal max party was observed.
+- **Open Q5, latency:** a full read fan-out (discover, 2× search, details, shows, dineout search, details, slots) took ~5 s.
+- **Bug found and fixed:** `maa/swiggy.result_to_dict` read the camelCase `isError`/`structuredContent`, but mcp≥2 uses `is_error`/`structured_content`. Every Swiggy error had been reported as success and structured data was dropped. Fixed, with tests.
+- **DR10:** Scenes `get_saved_locations` returns saved home/office addresses, not localities, so `/area <text>` is **not** built; the group area comes from a location pin only.
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
