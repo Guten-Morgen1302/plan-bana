@@ -260,6 +260,11 @@ class Rounds:
         if r is None or r["state"] in TERMINAL:
             await self.d.tg.answer_callback(cb["id"], copy.TOAST_CLOSED)
             return "closed"
+        # A round only accepts taps from its own group chat: callback data can be replayed from another chat
+        # by someone who saw the round id (e.g. a removed member), which would let them vote/RSVP here.
+        if ((cb.get("message") or {}).get("chat") or {}).get("id") != r["chat_id"]:
+            await self.d.tg.answer_callback(cb["id"], copy.TOAST_OLD)
+            return "wrong_chat"
         action = copy.ACTIONS[parsed.action]
         handler = getattr(self, f"_cb_{action}")
         organizer_only = action not in ("vote", "rsvp", "replace")

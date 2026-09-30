@@ -119,7 +119,8 @@ async def main(which: str) -> None:
     async def tap(uid: int, data: str):
         print(f"\n{USERS[uid]} taps {data}")
         out = await rounds.on_update({"callback_query": {"id": "x", "from": {"id": uid, "first_name": USERS[uid]},
-                                                         "data": data}})
+                                                         "data": data,
+                                                         "message": {"message_id": 1, "chat": {"id": CHAT}}}})
         await refresher.drain()
         return out
 

@@ -138,8 +138,13 @@ def wait_for_callback(redirect_uri: str, expected_state: str, timeout_s: float =
                 return
             query = parse_qs(url.query)
             if query.get("state", [""])[0] != expected_state:
-                result["error"] = "state mismatch"
-            elif "code" in query:
+                # Not our login (a scanner or a forged redirect hitting the public URL): refuse it but keep
+                # waiting, so a stray request can't abort the real login.
+                self.send_response(400)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
+            if "code" in query:
                 result["code"] = query["code"][0]
             else:
                 result["error"] = query.get("error_description", query.get("error", ["no code"]))[0]

@@ -140,9 +140,10 @@ class Harness:
                "from": {"id": uid, "first_name": USERS.get(uid, "U")}, "location": {"latitude": lat, "longitude": lng}}
         return await self.rounds.on_update({"update_id": self._mid, "message": msg})
 
-    async def tap(self, uid, data):
+    async def tap(self, uid, data, chat=CHAT):
         out = await self.rounds.on_update({"update_id": 0, "callback_query": {
-            "id": f"cb{uid}", "from": {"id": uid, "first_name": USERS.get(uid, f"U{uid}")}, "data": data}})
+            "id": f"cb{uid}", "from": {"id": uid, "first_name": USERS.get(uid, f"U{uid}")}, "data": data,
+            "message": {"message_id": 1, "chat": {"id": chat, "type": "group"}}}})
         await self.refresher.drain()
         return out
 
@@ -587,7 +588,20 @@ async def test_vote_burst_keeps_final_tally(tmp_path, n_taps):
     h = Harness(tmp_path)
     r = await to_voting(h)
     await asyncio.gather(*(h.rounds.on_update({"callback_query": {
-        "id": str(i), "from": {"id": 100 + i, "first_name": f"F{i}"}, "data": copy.encode("v", r["id"], 2)}})
+        "id": str(i), "from": {"id": 100 + i, "first_name": f"F{i}"}, "data": copy.encode("v", r["id"], 2),
+        "message": {"message_id": 1, "chat": {"id": CHAT, "type": "group"}}}})
         for i in range(n_taps)))
     await h.refresher.drain()
     assert h.round()["state"] == "RSVP" or "(" in h.tg.text(r["plans_msg"])
+
+
+async def test_taps_from_another_chat_are_refused(tmp_path):
+    """CSO F1: a round only accepts button taps from its own group, even with a valid round id."""
+    h = Harness(tmp_path)
+    r = await to_rsvp(h)
+    other = -2002
+    assert await h.tap(4, copy.encode("v", r["id"], 1), chat=other) == "wrong_chat"
+    assert await h.tap(4, copy.encode("r", r["id"], "c"), chat=other) == "wrong_chat"
+    assert await h.tap(1, copy.encode("b", r["id"]), chat=other) == "wrong_chat"   # even the organizer
+    assert 4 not in h.db.rsvps(r["id"]) and h.round()["state"] == "RSVP"
+    assert await h.tap(4, copy.encode("r", r["id"], "c")) == "rsvp"                 # same group still works

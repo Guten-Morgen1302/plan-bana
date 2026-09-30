@@ -54,7 +54,7 @@ def _hit_later(url: str) -> None:
         time.sleep(0.3)
         try:
             urllib.request.urlopen(url, timeout=5)
-        except HTTPError:
+        except OSError:  # HTTPError (400) or a transport reset while the server shuts down
             pass
 
     threading.Thread(target=go, daemon=True).start()
@@ -65,10 +65,24 @@ def test_callback_returns_code_on_matching_state():
     assert wait_for_callback(REDIRECT, "good", timeout_s=5) == "abc"
 
 
-def test_callback_rejects_state_mismatch():
+def test_wrong_state_is_refused_and_the_real_callback_still_wins():
+    """CSO F2: a stray/forged request must not end the login; its code is never accepted."""
+    out = {}
+    t = threading.Thread(target=lambda: out.update(code=wait_for_callback(REDIRECT, "good", timeout_s=5)))
+    t.start()
+    time.sleep(0.3)
+    with pytest.raises(HTTPError) as bad:
+        urllib.request.urlopen(f"{REDIRECT}?code=evil&state=evil")
+    assert bad.value.code == 400
+    urllib.request.urlopen(f"{REDIRECT}?code=abc&state=good").read()
+    t.join(5)
+    assert out["code"] == "abc"
+
+
+def test_only_wrong_state_requests_means_timeout():
     _hit_later(f"{REDIRECT}?code=abc&state=evil")
-    with pytest.raises(AuthError, match="state mismatch"):
-        wait_for_callback(REDIRECT, "good", timeout_s=5)
+    with pytest.raises(AuthError, match="no login callback"):
+        wait_for_callback(REDIRECT, "good", timeout_s=1.5)
 
 
 def test_callback_times_out():
