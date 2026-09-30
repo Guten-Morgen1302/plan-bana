@@ -1116,6 +1116,24 @@ Run with `python scripts/probe_plan.py` (Mulund pin). Sanitized copies are in `t
 - **Planner timing fix:** the event attempt now has its own deadline (90 − 35 s), so the dinner fallback always gets 35 s (R3-5). A live run had spent all 90 s on shows and returned 0 plans.
 - **The IST constant lives in `plan_bana/model.py`** (eng E9 said copy.py; one shared constant either way).
 
+## Build Status (2026-09-30)
+
+Built in 6 phases, each committed and pushed: probe → foundation → extraction → planner → bot → live E2E. `DRY_RUN=1` throughout.
+
+- **Tests:** 174 offline tests plus 8 opt-in real-Gemini evals (8/8 pass). All T1–T23 tasks are implemented. The one exception is `/area <text>` (DR10), which is pin-only because Scenes has no locality lookup.
+- **Live end-to-end (`scripts/sim_group.py`, real Gemini + real Swiggy, simulated Telegram):**
+  - Chat → Samjha (Wed, 4 log, ₹1000, Priya veg, comedy) in 5 s.
+  - 3 checked plans (Comedy In Thane 8:30 PM + FREE tables 0.9–2.4 km away at 10:30 PM) in 41 s.
+  - Votes → auto-lock, then RSVPs + 1 guest → Book → live re-check → **TEST_ONLY**.
+  - Final card pinned, exactly 4 new bot messages.
+- **Real Telegram:** `scripts/serve_plan.py` starts, authenticates as @MaaKaSwiggyBot and long-polls. What still needs a person: a group test with real friends (privacy mode off, bot re-added).
+- **Deviations from the doc, all recorded above:**
+  - IST lives in `model.py`.
+  - `propose_plans` takes eventId/showId/restaurantId/reservationTime; slotId/itemId always come from Swiggy's slot reply.
+  - New check 0 (show venue ≤ 30 km from the pin).
+  - The event attempt has its own deadline.
+  - `/area` is pin-only.
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
