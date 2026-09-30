@@ -19,6 +19,6 @@ probe_out/
 # demo video: node deps, rendered output and raw/cut recordings (large, contain personal screens)
 video/node_modules/
 video/out/
-video/public/clips/
+video/public/
 docs/demo/
 !docs/media/*.mp4
