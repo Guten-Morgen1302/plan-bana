@@ -227,7 +227,7 @@ export const End: React.FC = () => {
           </P>
         </Pop>
         <Pop at={3.1}>
-          <div style={{ fontFamily: mono, fontSize: 28, color: C.orangeSoft, marginTop: 8 }}>github.com/Guten-Morgen1302/maa-ka-swiggy</div>
+          <div style={{ fontFamily: mono, fontSize: 28, color: C.orangeSoft, marginTop: 8 }}>github.com/Guten-Morgen1302/plan-bana</div>
         </Pop>
       </AbsoluteFill>
     </AbsoluteFill>

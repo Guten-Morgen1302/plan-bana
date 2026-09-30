@@ -4,6 +4,7 @@ import { AppScene, CardScene, ChatScene, DecideScene, PartyScene, PlansScene, Sa
 import { ColdOpen, Logo, Problem } from "./intro";
 import { Chaining, End, Stats } from "./outro";
 import { FPS, s } from "./theme";
+import { Thumbnail } from "./thumbnail";
 
 // Footage scenes last exactly as long as their clip (video/public/clips, cut by video/cut_clips.sh).
 const SCENES: { C: React.FC; d: number }[] = [
@@ -38,5 +39,8 @@ const Main: React.FC = () => (
 );
 
 export const Root: React.FC = () => (
-  <Composition id="PlanBana" component={Main} durationInFrames={TOTAL} fps={FPS} width={1920} height={1080} />
+  <>
+    <Composition id="PlanBana" component={Main} durationInFrames={TOTAL} fps={FPS} width={1920} height={1080} />
+    <Composition id="Thumbnail" component={Thumbnail} durationInFrames={1} fps={FPS} width={1280} height={720} />
+  </>
 );
