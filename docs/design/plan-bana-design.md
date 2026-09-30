@@ -1106,6 +1106,16 @@ Run with `python scripts/probe_plan.py` (Mulund pin). Sanitized copies are in `t
 - **Bug found and fixed:** `maa/swiggy.result_to_dict` read the camelCase `isError`/`structuredContent`, but mcp≥2 uses `is_error`/`structured_content`. Every Swiggy error had been reported as success and structured data was dropped. Fixed, with tests.
 - **DR10:** Scenes `get_saved_locations` returns saved home/office addresses, not localities, so `/area <text>` is **not** built; the group area comes from a location pin only.
 
+- **Scenes shows (found while building the planner):** `list_event_shows` ignores `showStartTime`/`showEndTime` and returns only each event's **next** show date (`dateSummary` has one date). On 2026-09-30 most Mumbai comedy was "tonight only" and Comedy Cartel was next on 8 Oct. Consequences:
+  - The planner filters shows to the plan date, and `get_event` tells the model `next_show`.
+  - A Saturday plan often gets dinner-only plans. That is correct behaviour, not a bug.
+- **Live runs (`scripts/try_plan.py`):**
+  - "aaj raat comedy, 1000 tak, Priya veg" gave 3 show+table plans (Comedy In Thane 8:30 PM + FREE tables 0.9–2.4 km away at 10:30 PM) in 55 s with 20 Swiggy calls.
+  - The Saturday chat gave 3 dinner-only plans in 30 s.
+  - A plan with a restaurant 6 km from the venue was correctly rejected.
+- **Planner timing fix:** the event attempt now has its own deadline (90 − 35 s), so the dinner fallback always gets 35 s (R3-5). A live run had spent all 90 s on shows and returned 0 plans.
+- **The IST constant lives in `plan_bana/model.py`** (eng E9 said copy.py; one shared constant either way).
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |

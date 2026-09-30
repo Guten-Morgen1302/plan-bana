@@ -252,7 +252,7 @@ def plan_block(p: PlanOption) -> list[str]:
     dist = ""
     if r.distance_km is not None and r.searched_at_venue:
         dist = f" · {r.distance_km:g} km"
-    lead = "🍽" if not p.event else "🍕"
+    lead = "🍽"
     when = time_label(p.reservation_time)
     if not p.event:
         when = dt.datetime.fromtimestamp(p.reservation_time, IST).strftime("%a") + " " + when

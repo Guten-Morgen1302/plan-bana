@@ -108,7 +108,7 @@ def test_plan_block_fit_words_and_costs():
     text = "\n".join(copy.plan_block(p))
     assert "1 · Comedy + Pizza" in text
     assert "🎭 Sat raat 8:30 baje · Comedy In Thane · Backspace Thane" in text
-    assert "🍕 raat 10:30 baje · Pizza Express · 1.2 km · FREE table" in text
+    assert "🍽 raat 10:30 baje · Pizza Express · 1.2 km · FREE table" in text
     assert "~₹750/head (ticket ₹249 + khana ~₹501)" in text
     assert "Priya: budget ? pata nahi" in text and "Aman: veg ✗ nahi" in text
 
