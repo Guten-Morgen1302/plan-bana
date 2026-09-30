@@ -1,6 +1,7 @@
 """Day-1 probe against the REAL Swiggy account (there is no sandbox).
 
   python scripts/probe.py login                       # browser: phone + OTP
+  python scripts/probe.py login --public              # same, via the production redirect URI (starts ngrok)
   python scripts/probe.py status                      # token validity
   python scripts/probe.py tools [--server scenes|dineout|im|food]         # list tool names
   python scripts/probe.py call <tool> '<json args>'   # read/cart tools only
@@ -15,21 +16,26 @@ import argparse
 import asyncio
 import json
 import os
+import shutil
+import subprocess
 import sys
 import time
+from contextlib import contextmanager
 from pathlib import Path
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from plan_bana.auth import CredentialStore, login
+from plan_bana.auth import CALLBACK_PORT, CredentialStore, is_local, login
 from plan_bana.swiggy import PLACE_ORDER_TOOLS, connect, orders_enabled
 
 load_dotenv(ROOT / ".env")
 BASE_URL = os.getenv("SWIGGY_BASE_URL", "https://mcp.swiggy.com")
 REDIRECT_URI = os.getenv("SWIGGY_REDIRECT_URI", "http://localhost:8765/callback")
+PUBLIC_REDIRECT_URI = os.getenv("SWIGGY_PUBLIC_REDIRECT_URI", "")
 STORE = CredentialStore(ROOT / ".secrets" / "swiggy.json")
 OUT = ROOT / "probe_out"
 
@@ -58,10 +64,34 @@ async def run_tool(server: str, tool: str, args: dict, *, order: bool = False) -
     print(f"\n[is_error={result['is_error']}] saved -> {path.relative_to(ROOT)}")
 
 
+@contextmanager
+def tunnel(redirect_uri: str):
+    """For a public https redirect: forward its host to the local callback port with ngrok while logging in."""
+    if is_local(redirect_uri):
+        yield
+        return
+    ngrok = os.getenv("NGROK_BIN") or shutil.which("ngrok")
+    if not ngrok:
+        sys.exit("A public redirect URI needs ngrok (install it or set NGROK_BIN).")
+    host = urlparse(redirect_uri).hostname
+    proc = subprocess.Popen([ngrok, "http", f"--url=https://{host}", str(CALLBACK_PORT), "--log=stdout"],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    time.sleep(4)
+    if proc.poll() is not None:
+        sys.exit("ngrok exited: is the auth token set (ngrok config add-authtoken ...) and the domain yours?")
+    print(f"Tunnel up: https://{host} → 127.0.0.1:{CALLBACK_PORT}"
+          " (ngrok may show a 'Visit Site' warning page first; click through it)")
+    try:
+        yield
+    finally:
+        proc.terminate()
+
+
 async def main() -> None:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("login")
+    p_login = sub.add_parser("login")
+    p_login.add_argument("--public", action="store_true", help="use SWIGGY_PUBLIC_REDIRECT_URI via ngrok")
     sub.add_parser("status")
     p_tools = sub.add_parser("tools")
     p_tools.add_argument("--server", default="scenes")
@@ -73,7 +103,11 @@ async def main() -> None:
     ns = parser.parse_args()
 
     if ns.cmd == "login":
-        creds = login(BASE_URL, REDIRECT_URI, STORE)
+        redirect = PUBLIC_REDIRECT_URI if ns.public else REDIRECT_URI
+        if not redirect:
+            sys.exit("Set SWIGGY_PUBLIC_REDIRECT_URI in .env to use --public.")
+        with tunnel(redirect):
+            creds = login(BASE_URL, redirect, STORE)
         print(f"Logged in. Token valid for {creds.seconds_left() / 3600:.1f} h.")
     elif ns.cmd == "status":
         creds = STORE.load()

@@ -74,3 +74,25 @@ def test_callback_rejects_state_mismatch():
 def test_callback_times_out():
     with pytest.raises(AuthError, match="no login callback"):
         wait_for_callback(REDIRECT, "good", timeout_s=0.5)
+
+
+def test_public_redirect_is_served_locally_on_the_callback_port():
+    from plan_bana.auth import is_local, listen_address
+
+    public = "https://deadly-deciding-joey.ngrok-free.app/oauth/callback"
+    assert not is_local(public) and is_local(REDIRECT)
+    assert listen_address(public, 8798) == ("127.0.0.1", 8798)
+    assert listen_address(REDIRECT) == ("localhost", 8799)
+
+
+def test_public_redirect_callback_returns_code_and_ignores_other_paths():
+    public = "https://example.ngrok-free.app/oauth/callback"
+    out = {}
+    t = threading.Thread(target=lambda: out.update(code=wait_for_callback(public, "s1", 5, public_port=8797)))
+    t.start()
+    time.sleep(0.3)
+    with pytest.raises(HTTPError):
+        urllib.request.urlopen("http://127.0.0.1:8797/favicon.ico")  # 404, keeps waiting
+    urllib.request.urlopen("http://127.0.0.1:8797/oauth/callback?state=s1&code=abc").read()
+    t.join(5)
+    assert out["code"] == "abc"

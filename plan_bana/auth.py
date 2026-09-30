@@ -4,8 +4,12 @@ We don't use the MCP SDK's OAuthClientProvider: Swiggy's /.well-known/oauth-prot
 returns 404, so the SDK falls back to expecting issuer "https://mcp.swiggy.com/" while Swiggy
 advertises "https://mcp.swiggy.com/auth", and the SDK rejects the mismatch.
 
-Flow: dynamic client registration -> browser login (phone + OTP) -> localhost callback -> token.
-No refresh tokens in v1; the access token lives 5 days, then we re-run this flow.
+Flow: dynamic client registration -> browser login (phone + OTP) -> callback -> token.
+No refresh tokens; the access token lives 5 days, then we re-run this flow.
+
+Callbacks: a localhost redirect (http://localhost:8765/callback) is served directly. A public HTTPS redirect
+(e.g. https://<name>.ngrok-free.app/oauth/callback) is served on 127.0.0.1:CALLBACK_PORT and reached through
+a tunnel that forwards the public host to that port (scripts/probe.py login starts ngrok for it).
 """
 
 from __future__ import annotations
@@ -27,6 +31,19 @@ import httpx
 SCOPE = "mcp:tools"
 CLIENT_NAME = "plan-bana"
 REFRESH_MARGIN_S = 60
+CALLBACK_PORT = 8765  # local port behind a public (tunnelled) redirect URI
+
+
+def is_local(redirect_uri: str) -> bool:
+    return (urlparse(redirect_uri).hostname or "") in ("localhost", "127.0.0.1")
+
+
+def listen_address(redirect_uri: str, public_port: int = CALLBACK_PORT) -> tuple[str, int]:
+    """Where to bind the one-shot callback server for this redirect URI."""
+    parsed = urlparse(redirect_uri)
+    if is_local(redirect_uri):
+        return parsed.hostname or "localhost", parsed.port or 80
+    return "127.0.0.1", public_port
 
 
 class AuthError(Exception):
@@ -105,8 +122,9 @@ def authorize_url(base_url: str, client_id: str, redirect_uri: str, challenge: s
     return f"{base_url}/auth/authorize?{urlencode(params)}"
 
 
-def wait_for_callback(redirect_uri: str, expected_state: str, timeout_s: float = 300) -> str:
-    """Serve one request on the redirect URI and return the authorization code."""
+def wait_for_callback(redirect_uri: str, expected_state: str, timeout_s: float = 300,
+                      public_port: int = CALLBACK_PORT) -> str:
+    """Serve the redirect URI's path until the login callback arrives; return the authorization code."""
     parsed = urlparse(redirect_uri)
     result: dict[str, str] = {}
     done = threading.Event()
@@ -114,8 +132,8 @@ def wait_for_callback(redirect_uri: str, expected_state: str, timeout_s: float =
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
             url = urlparse(self.path)
-            if url.path != parsed.path:
-                self.send_response(404)
+            if url.path != parsed.path or done.is_set():
+                self.send_response(404)  # favicon, health checks, or a second hit after we're done
                 self.end_headers()
                 return
             query = parse_qs(url.query)
@@ -136,7 +154,7 @@ def wait_for_callback(redirect_uri: str, expected_state: str, timeout_s: float =
         def log_message(self, *args):
             pass
 
-    server = HTTPServer((parsed.hostname or "localhost", parsed.port or 80), Handler)
+    server = HTTPServer(listen_address(redirect_uri, public_port), Handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
