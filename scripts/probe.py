@@ -2,7 +2,7 @@
 
   python scripts/probe.py login                       # browser: phone + OTP
   python scripts/probe.py status                      # token validity
-  python scripts/probe.py tools [--server im]         # list tool names
+  python scripts/probe.py tools [--server scenes|dineout|im|food]         # list tool names
   python scripts/probe.py call <tool> '<json args>'   # read/cart tools only
   python scripts/probe.py place <tool> '<json args>'  # real order: asks you to type PLACE
 
@@ -64,12 +64,12 @@ async def main() -> None:
     sub.add_parser("login")
     sub.add_parser("status")
     p_tools = sub.add_parser("tools")
-    p_tools.add_argument("--server", default="im")
+    p_tools.add_argument("--server", default="scenes")
     for name in ("call", "place"):
         p = sub.add_parser(name)
         p.add_argument("tool")
         p.add_argument("args", nargs="?", default="{}")
-        p.add_argument("--server", default="im")
+        p.add_argument("--server", default="scenes")
     ns = parser.parse_args()
 
     if ns.cmd == "login":

@@ -26,9 +26,9 @@ def check_gemini() -> str:
 
 
 def check_telegram() -> str:
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    token = os.getenv("PLAN_TELEGRAM_BOT_TOKEN")
     if not token:
-        return "missing TELEGRAM_BOT_TOKEN"
+        return "missing PLAN_TELEGRAM_BOT_TOKEN"
     r = httpx.get(f"https://api.telegram.org/bot{token}/getMe", timeout=15)
     data = r.json()
     if not data.get("ok"):
@@ -36,25 +36,9 @@ def check_telegram() -> str:
     return f"bot @{data['result']['username']}"
 
 
-def check_sarvam() -> str:
-    key = os.getenv("SARVAM_API_KEY")
-    if not key:
-        return "missing SARVAM_API_KEY"
-    r = httpx.post(
-        "https://api.sarvam.ai/text-to-speech",
-        headers={"api-subscription-key": key},
-        json={"text": "haan", "target_language_code": "hi-IN"},
-        timeout=30,
-    )
-    if r.status_code >= 400:
-        raise RuntimeError(f"HTTP {r.status_code}: {r.text[:200]}")
-    audios = r.json().get("audios") or []
-    return f"text-to-speech returned {len(audios)} audio clip(s)"
-
-
 def main() -> int:
     failed = 0
-    for name, fn in [("Gemini", check_gemini), ("Telegram", check_telegram), ("Sarvam", check_sarvam)]:
+    for name, fn in [("Gemini", check_gemini), ("Telegram", check_telegram)]:
         try:
             msg = fn()
             status = "FAIL" if msg.startswith("missing") else "PASS"

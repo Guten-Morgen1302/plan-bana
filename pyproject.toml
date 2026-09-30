@@ -1,15 +1,13 @@
 [project]
-name = "maa-ka-swiggy"
+name = "plan-bana"
 version = "0.1.0"
-description = "Hinglish WhatsApp voice-note grocery agent for parents, built on Swiggy MCP"
+description = "Telegram friend-group outing planner on Swiggy Scenes + Dineout (MCP)"
 requires-python = ">=3.12"
 dependencies = [
     "mcp>=2.2",
     "httpx>=0.28",
     "python-dotenv>=1.0",
     "google-genai>=2.25",
-    "fastapi>=0.115",
-    "uvicorn>=0.30",
 ]
 
 [project.optional-dependencies]

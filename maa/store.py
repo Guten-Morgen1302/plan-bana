@@ -1,4 +1,4 @@
-"""SQLite state: durable jobs with leases, inbound WhatsApp dedup, and timers.
+"""SQLite state: durable jobs with leases, timers and settings.
 
 Job lease lifecycle:
 
@@ -6,13 +6,12 @@ Job lease lifecycle:
                    ▲                    │
                    └── lease expired ───┘  (reclaim_expired, run at startup and before claims)
 
-    Timer jobs (kind="timer") for the same draft that are all overdue collapse to one:
+    Timer jobs (kind="timer") for the same draft/round that are all overdue collapse to one:
     the highest-priority action runs, the rest are marked skipped (re-review D1).
 
 Rules enforced here:
-- A family's job is claimable only while no other job of that family is leased (CEO D6):
-  Swiggy's update_cart replaces the whole cart, so two turns at once lose items.
-- An inbound wamid is processed once; a claim older than CLAIM_STALE_S is reclaimable (eng D2).
+- A family's job (one Telegram group = one family) is claimable only while no other job of
+  that family is leased, so one group's work runs serially while different groups run in parallel.
 - complete()/fail() only succeed for the current lease owner, so a stale worker can't
   overwrite a newer owner's result.
 """
@@ -22,11 +21,9 @@ from __future__ import annotations
 import json
 import sqlite3
 from dataclasses import dataclass
-from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-CLAIM_STALE_S = 600  # inbound message claimed but never completed -> reclaimable
 DEFAULT_LEASE_S = 120
 
 # Higher wins when several timers of one draft are overdue at once.
@@ -51,36 +48,12 @@ CREATE INDEX IF NOT EXISTS jobs_claim ON jobs (state, run_at, id);
 CREATE INDEX IF NOT EXISTS jobs_family ON jobs (family_id, state);
 CREATE INDEX IF NOT EXISTS jobs_draft ON jobs (draft_id, kind, state);
 
-CREATE TABLE IF NOT EXISTS drafts (
-    id          TEXT PRIMARY KEY,
-    family_id   TEXT NOT NULL,
-    state       TEXT NOT NULL,          -- AWAITING_PARENT | CHILD_APPROVAL_PENDING | CANCELLED | ...
-    transcript  TEXT,
-    snapshot    TEXT,                   -- CartSnapshot.to_json()
-    created_at  REAL NOT NULL,
-    updated_at  REAL NOT NULL
-);
-CREATE INDEX IF NOT EXISTS drafts_family ON drafts (family_id, state);
-
 CREATE TABLE IF NOT EXISTS settings (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS inbound_messages (
-    wamid        TEXT PRIMARY KEY,
-    family_id    TEXT NOT NULL,
-    state        TEXT NOT NULL,                      -- claimed | completed
-    claimed_at   REAL NOT NULL,
-    completed_at REAL
-);
 """
-
-
-class InboundClaim(StrEnum):
-    NEW = "new"                # first delivery: process it
-    RECLAIMED = "reclaimed"    # earlier claim went stale (crash): process it again
-    DUPLICATE = "duplicate"    # already completed or in progress: ignore
 
 
 @dataclass(frozen=True)
@@ -108,37 +81,6 @@ class Store:
     def __init__(self, conn: sqlite3.Connection):
         self.conn = conn
 
-    # ---------- inbound dedup (eng D2) ----------
-
-    def claim_inbound(self, wamid: str, family_id: str, now: float) -> InboundClaim:
-        with self._tx():
-            row = self.conn.execute(
-                "SELECT state, claimed_at FROM inbound_messages WHERE wamid = ?", (wamid,)
-            ).fetchone()
-            if row is None:
-                self.conn.execute(
-                    "INSERT INTO inbound_messages (wamid, family_id, state, claimed_at) VALUES (?, ?, 'claimed', ?)",
-                    (wamid, family_id, now),
-                )
-                return InboundClaim.NEW
-            if row["state"] == "claimed" and now - row["claimed_at"] > CLAIM_STALE_S:
-                self.conn.execute(
-                    "UPDATE inbound_messages SET claimed_at = ? WHERE wamid = ?", (now, wamid)
-                )
-                return InboundClaim.RECLAIMED
-            return InboundClaim.DUPLICATE
-
-    def complete_inbound(self, wamid: str, now: float) -> None:
-        self.conn.execute(
-            "UPDATE inbound_messages SET state = 'completed', completed_at = ? WHERE wamid = ?", (now, wamid)
-        )
-
-    def prune_inbound(self, now: float, keep_s: float = 7 * 24 * 3600) -> int:
-        """Meta retries for up to 7 days; ids older than that can go."""
-        return self.conn.execute(
-            "DELETE FROM inbound_messages WHERE state = 'completed' AND completed_at < ?", (now - keep_s,)
-        ).rowcount
-
     # ---------- settings ----------
 
     def get_setting(self, key: str) -> str | None:
@@ -157,45 +99,6 @@ class Store:
             value = self.get_setting(key)
             self.conn.execute("DELETE FROM settings WHERE key = ?", (key,))
         return value
-
-    def get_draft(self, draft_id: str) -> sqlite3.Row | None:
-        return self.conn.execute("SELECT * FROM drafts WHERE id = ?", (draft_id,)).fetchone()
-
-    # ---------- drafts ----------
-
-    OPEN_DRAFT_STATES = ("AWAITING_PARENT", "CHILD_APPROVAL_PENDING", "PLACING", "NEEDS_REVIEW")
-
-    def create_draft(self, draft_id: str, family_id: str, state: str, transcript: str, snapshot: str, now: float) -> None:
-        self.conn.execute(
-            "INSERT INTO drafts (id, family_id, state, transcript, snapshot, created_at, updated_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (draft_id, family_id, state, transcript, snapshot, now, now),
-        )
-
-    def open_draft(self, family_id: str) -> sqlite3.Row | None:
-        marks = ",".join("?" * len(self.OPEN_DRAFT_STATES))
-        return self.conn.execute(
-            f"SELECT * FROM drafts WHERE family_id = ? AND state IN ({marks}) ORDER BY created_at DESC LIMIT 1",
-            (family_id, *self.OPEN_DRAFT_STATES),
-        ).fetchone()
-
-    def set_draft_state(self, draft_id: str, expected: str, new: str, now: float) -> bool:
-        """Compare-and-set, so two handlers can't both move the same draft."""
-        cur = self.conn.execute(
-            "UPDATE drafts SET state = ?, updated_at = ? WHERE id = ? AND state = ?", (new, now, draft_id, expected)
-        )
-        return cur.rowcount == 1
-
-    def cancel_open_drafts(self, family_id: str, now: float, states: tuple[str, ...] = ("AWAITING_PARENT",)) -> int:
-        marks = ",".join("?" * len(states))
-        return self.conn.execute(
-            f"UPDATE drafts SET state = 'CANCELLED', updated_at = ? WHERE family_id = ? AND state IN ({marks})",
-            (now, family_id, *states),
-        ).rowcount
-
-    def draft_state(self, draft_id: str) -> str | None:
-        row = self.conn.execute("SELECT state FROM drafts WHERE id = ?", (draft_id,)).fetchone()
-        return row["state"] if row else None
 
     # ---------- jobs ----------
 

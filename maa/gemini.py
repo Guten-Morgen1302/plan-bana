@@ -1,4 +1,4 @@
-"""Gemini adapter for maa.agent.Model (google-genai, manual function calling).
+"""Gemini adapter for maa.llm.Model (google-genai, manual function calling).
 
 We keep the model's own Content objects in the history so Gemini's thought
 signatures survive between turns.
@@ -11,7 +11,7 @@ from typing import Any
 from google import genai
 from google.genai import types
 
-from maa.agent import ModelTurn, ToolCall
+from maa.llm import ModelTurn, ToolCall
 
 
 class GeminiModel:

@@ -1,6 +1,6 @@
 import pytest
 
-from maa.store import CLAIM_STALE_S, InboundClaim, Store, connect
+from maa.store import Store, connect
 
 T0 = 1_000_000.0
 
@@ -9,35 +9,6 @@ T0 = 1_000_000.0
 def store(tmp_path):
     return Store(connect(tmp_path / "state.db"))
 
-
-# ---------- inbound dedup (eng D2) ----------
-
-def test_first_delivery_is_new_then_duplicate(store):
-    assert store.claim_inbound("wamid.1", "fam", T0) is InboundClaim.NEW
-    assert store.claim_inbound("wamid.1", "fam", T0 + 1) is InboundClaim.DUPLICATE
-
-
-def test_completed_message_stays_duplicate(store):
-    store.claim_inbound("wamid.1", "fam", T0)
-    store.complete_inbound("wamid.1", T0 + 5)
-    assert store.claim_inbound("wamid.1", "fam", T0 + CLAIM_STALE_S * 10) is InboundClaim.DUPLICATE
-
-
-def test_stale_claim_is_reclaimed_after_crash(store):
-    store.claim_inbound("wamid.1", "fam", T0)
-    assert store.claim_inbound("wamid.1", "fam", T0 + CLAIM_STALE_S - 1) is InboundClaim.DUPLICATE
-    assert store.claim_inbound("wamid.1", "fam", T0 + CLAIM_STALE_S + 1) is InboundClaim.RECLAIMED
-
-
-def test_prune_keeps_recent_ids(store):
-    store.claim_inbound("old", "fam", T0)
-    store.complete_inbound("old", T0)
-    store.claim_inbound("new", "fam", T0)
-    store.complete_inbound("new", T0 + 8 * 24 * 3600)
-    assert store.prune_inbound(T0 + 8 * 24 * 3600) == 1
-
-
-# ---------- jobs: leases and per-family serial claim (CEO D6) ----------
 
 def test_claim_returns_due_jobs_in_order(store):
     a = store.enqueue("fam1", "voice", {"n": 1}, run_at=T0, now=T0)

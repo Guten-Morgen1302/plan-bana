@@ -1,20 +1,20 @@
-# Maa ka Swiggy
+# Plan Bana
 
-Mom sends a Hinglish WhatsApp voice note ("doodh, bread, ande bhej do"). An AI agent builds a Swiggy Instamart cart, reads it back to her as a voice note, and her child approves the order on Telegram. Built on [Swiggy Builders Club](https://mcp.swiggy.com/builders/) MCP.
+Add the bot to your friends' Telegram group. Chat like normal ("sat raat free hu", "budget 800 max", "veg hai main"), then type `/plan`. The bot reads the chat and says what it understood. It proposes up to 3 real plans (a Swiggy Scenes show plus a FREE Dineout table nearby, after the show ends). Friends vote, and the organizer taps Book. Built on [Swiggy Builders Club](https://mcp.swiggy.com/builders/) MCP.
 
-**Safety design:** the LLM only gets read and cart tools. Orders are placed by plain code, and only after two human approvals (Mom's "haan" plus the child's tap). Checkout is never blindly retried, so a network error can't create a duplicate order.
+**Safety design:** the LLM only gets read tools. Every ID in a plan must come from a Swiggy response, and code checks the timing, budget and veg rules. Tables are booked by plain code, and only after the organizer taps Book. `DRY_RUN=1` blocks every booking.
 
 ## Status
-Work in progress (Day 1-2 of a 10-day build).
+Design approved (office hours + CEO + eng review). Build not started.
 
 | Part | State |
 |---|---|
-| Swiggy OAuth 2.1 + PKCE login (`maa/auth.py`) | done |
-| Swiggy MCP client + response parsing (`maa/swiggy.py`) | done |
-| Durable SQLite jobs, dedup, per-family serial processing (`maa/store.py`) | done |
-| Gemini agent with guarded tools (`maa/agent.py`, `maa/gemini.py`) | done |
-| Commit state machine (approvals, COD checkout, reconciliation) | next |
-| Telegram child bot, WhatsApp webhook, Sarvam voice | planned |
+| Swiggy OAuth 2.1 + PKCE login (`maa/auth.py`) | done (reused) |
+| Swiggy MCP client, DRY_RUN booking lock (`maa/swiggy.py`) | done (reused) |
+| Durable SQLite jobs, per-group serial processing (`maa/store.py`) | done (reused) |
+| Gemini adapter (`maa/gemini.py`, `maa/llm.py`), Telegram client (`maa/telegram.py`) | done (reused) |
+| Draft planner (`maa/plan.py`, `scripts/try_plan.py`) | draft |
+| `plan_bana/` package (buffer, extraction, checks, rounds, bot) | next |
 
 ## Setup
 ```bash
@@ -23,14 +23,12 @@ python -m venv .venv
 cp .env.example .env                               # fill in the keys
 python scripts/check_keys.py                       # PASS/FAIL per API key
 python scripts/probe.py login                      # Swiggy phone + OTP in the browser
-python scripts/try_agent.py "do packet doodh aur ek brown bread"
+python scripts/try_plan.py "saturday raat 4 log, comedy show aur phir pizza"
 pytest -q
 ```
 
-There is no Swiggy sandbox: every call hits production on your own account. `DRY_RUN=1` is the default, and `scripts/probe.py place ...` requires typing `PLACE`.
+There is no Swiggy sandbox: every call hits production on your own account. `DRY_RUN=1` is the default.
 
 ## Docs
-- [docs/design/maa-ka-swiggy-design.md](docs/design/maa-ka-swiggy-design.md): design and every review decision
-- [docs/design/test-plan.md](docs/design/test-plan.md): the test plan
+- [docs/design/plan-bana-design.md](docs/design/plan-bana-design.md): design, every review decision, and the implementation tasks
 - [docs/swiggy/](docs/swiggy/): snapshot of the Swiggy Builders Club docs
-- [TODOS.md](TODOS.md): deferred work
