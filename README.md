@@ -11,7 +11,7 @@ A Telegram bot for friend groups, built on Swiggy's MCP servers: it reads the ch
 **▶ [Watch the 2-minute demo](https://youtu.be/ocu2PfEBXic)** · real booking, recorded live on 30 Sep 2026
 
 ![Python](https://img.shields.io/badge/python-3.12+-3776AB?logo=python&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-176%20passing-3ddc84)
+![Tests](https://img.shields.io/badge/tests-178%20passing-3ddc84)
 ![Evals](https://img.shields.io/badge/real--Gemini%20evals-8%2F8-3ddc84)
 ![Swiggy MCP](https://img.shields.io/badge/Swiggy%20MCP-Scenes%20%2B%20Dineout-fc8019)
 ![Telegram](https://img.shields.io/badge/Telegram-bot-2AABEE?logo=telegram&logoColor=white)
@@ -96,7 +96,7 @@ plan_bana/
   store.py      durable per-group job queue with leases
   swiggy.py     MCP client with the DRY_RUN booking lock · auth.py  OAuth 2.1 + PKCE
 scripts/        serve_plan (the bot) · try_plan · sim_group · preflight · reset_demo · probe · check_keys
-tests/          176 tests: full rounds, planner, checks, parsers on real fixtures + 8 real-Gemini evals
+tests/          178 tests: full rounds, planner, checks, parsers on real fixtures + 8 real-Gemini evals
 video/          the demo video: Remotion motion graphics + Gemini TTS voice-over
 docs/design/    design doc with every review decision (office hours, CEO, eng ×2, design)
 ```
@@ -108,7 +108,7 @@ python -m venv .venv && .venv/Scripts/python -m pip install -e ".[dev]"   # Wind
 cp .env.example .env                  # Gemini key + Telegram bot token
 python scripts/probe.py login         # Swiggy phone + OTP (OAuth 2.1 + PKCE)
 python scripts/check_keys.py          # PASS/FAIL per key
-pytest -q                             # 176 offline tests
+pytest -q                             # 178 offline tests
 ```
 
 Try it without Telegram (real Gemini + real Swiggy, books nothing):
@@ -130,7 +130,7 @@ Commands: `/plan` · `/status` · `/forget` · `/area` · `/debug` (owner only).
 ## Tests
 
 ```bash
-pytest -q                          # 176 tests, offline: fake Swiggy in the live response formats + scripted Gemini
+pytest -q                          # 178 tests, offline: fake Swiggy in the live response formats + scripted Gemini
 RUN_EVALS=1 pytest tests/evals -q  # 8 real-Gemini chats: Hinglish, English, हिंदी, sarcasm, ties, drop-outs
 ```
 
