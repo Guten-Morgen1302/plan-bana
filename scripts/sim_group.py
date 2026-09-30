@@ -102,7 +102,8 @@ async def main(which: str) -> None:
     refresher = MessageRefresher(tg, min_gap=0.2)
     rounds = Rounds(Deps(db=db, store=store, tg=tg, sessions=sessions,
                          make_model=lambda: GeminiModel(os.environ["GEMINI_API_KEY"],
-                                                        os.getenv("GEMINI_MODEL", "gemini-3.8-flash")),
+                                                        os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
+                                                        thinking_level=os.getenv("GEMINI_THINKING", "low") or None),
                          refresher=refresher, clock=time.time, owner_id=1, owner_name="Harsh"))
     mid = {"n": 1000}
 

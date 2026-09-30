@@ -122,7 +122,7 @@ async def main() -> None:
         me = await tg.get_me()
         owner = os.getenv("PLAN_OWNER_TELEGRAM_ID", "").strip()
         deps = Deps(db=db, store=store, tg=tg, sessions=sessions,
-                    make_model=lambda: GeminiModel(gemini_key, model_name),
+                    make_model=lambda: GeminiModel(gemini_key, model_name, thinking_level=os.getenv("GEMINI_THINKING", "low") or None),
                     refresher=MessageRefresher(tg), clock=time.time,
                     owner_id=int(owner) if owner.isdigit() else None, bot_id=me["id"])
         rounds = Rounds(deps)

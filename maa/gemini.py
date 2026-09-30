@@ -15,10 +15,13 @@ from maa.llm import ModelTurn, ToolCall
 
 
 class GeminiModel:
-    def __init__(self, api_key: str, model: str, temperature: float = 0.2):
+    def __init__(self, api_key: str, model: str, temperature: float = 0.2, thinking_level: str | None = None):
         self.client = genai.Client(api_key=api_key)
         self.model = model
         self.temperature = temperature
+        # "low" keeps each tool-calling turn to a few seconds; default (dynamic) thinking sometimes took 30+ s
+        # per planner turn live and blew the 90 s planning deadline.
+        self.thinking = types.ThinkingConfig(thinking_level=thinking_level) if thinking_level else None
         self.history: list[types.Content] = []
         self.config: types.GenerateContentConfig | None = None
 
@@ -32,6 +35,7 @@ class GeminiModel:
             tools=[types.Tool(function_declarations=decls)],
             automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
             temperature=self.temperature,
+            thinking_config=self.thinking,
         )
         self.history = [types.Content(role="user", parts=[types.Part.from_text(text=user_text)])]
         return self._generate()

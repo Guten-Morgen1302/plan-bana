@@ -36,7 +36,7 @@ from plan_bana.model import IST, Constraints, PlanOption
 MAX_PLANS = 3
 CALL_CAPS = {"event": 12, "retry": 8, "dinner": 10}
 DEADLINE_S = 90.0
-DINNER_RESERVE_S = 35.0  # the event attempt may not eat the dinner fallback's time (R3-5)
+DINNER_RESERVE_S = 25.0  # the event attempt may not eat the dinner fallback's time (R3-5); live dinner ≈ 15 s
 MAX_STEPS = 10
 SLOT_LIST_MAX = 16
 

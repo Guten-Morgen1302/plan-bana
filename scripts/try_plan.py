@@ -41,7 +41,8 @@ async def main(messages: list[str]) -> None:
     area = os.getenv("PLAN_AREA", "Mulund, Mumbai")
 
     def make_model() -> GeminiModel:
-        return GeminiModel(os.environ["GEMINI_API_KEY"], os.getenv("GEMINI_MODEL", "gemini-3.8-flash"))
+        return GeminiModel(os.environ["GEMINI_API_KEY"], os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
+                           thinking_level=os.getenv("GEMINI_THINKING", "low") or None)
 
     now = time.time()
     names: dict[str, int] = {}
