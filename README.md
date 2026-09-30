@@ -6,7 +6,7 @@
 
 A Telegram bot for friend groups, built on Swiggy's MCP servers: it reads the chat, proposes real **Swiggy Scenes** shows + **FREE Dineout** tables that fit everyone, lets the group vote, and books the table.
 
-[![Plan Bana demo](docs/media/demo.gif)](docs/media/plan-bana-demo.mp4)
+[![Plan Bana demo](docs/media/demo.gif)](https://youtu.be/ocu2PfEBXic)
 
 **▶ [Watch the 2-minute demo](https://youtu.be/ocu2PfEBXic)** · real booking, recorded live on 30 Sep 2026
 

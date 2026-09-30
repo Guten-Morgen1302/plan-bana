@@ -20,5 +20,5 @@ probe_out/
 video/node_modules/
 video/out/
 video/public/clips/
-docs/demo/*.mp4
+docs/demo/
 !docs/media/*.mp4
