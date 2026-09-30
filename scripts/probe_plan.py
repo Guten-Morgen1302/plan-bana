@@ -14,6 +14,7 @@ import asyncio
 import datetime as dt
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -25,6 +26,7 @@ sys.path.insert(0, str(ROOT))
 
 from maa.auth import CredentialStore
 from maa.swiggy import connect
+from plan_bana.model import IST
 
 load_dotenv(ROOT / ".env")
 OUT = ROOT / "probe_out"
@@ -37,7 +39,7 @@ def save(name: str, args: dict, res: dict) -> None:
     )
 
 
-def show(name: str, res: dict, n: int = 1500) -> None:  # noqa: D401
+def show(name: str, res: dict, n: int = 1500) -> None:
     body = res["structured"] or res["parsed"] or res["text"]
     print(f"\n=== {name} is_error={res['is_error']}")
     print(json.dumps(body, ensure_ascii=False)[:n] if not isinstance(body, str) else body[:n])
@@ -71,14 +73,14 @@ async def main(lat: float, lng: float) -> None:
             sh = await sc.call("list_event_shows", {"eventId": eid, **({"venueId": venue} if venue else {}), **loc})
             save("event-shows", {"eventId": eid, "venueId": venue}, sh)
             show("list_event_shows", sh, 3000)
-        import re
         ids = re.findall(r"\(ID: (\d+)\)", rs.get("text", ""))
         rid = ids[2] if len(ids) > 2 else (ids[0] if ids else None)
         if rid:
             det = await do.call("get_restaurant_details", {"restaurantId": rid, **loc})
             save("dineout-details", {"restaurantId": rid}, det)
             show("get_restaurant_details", det, 2500)
-            day = (dt.date.today() + dt.timedelta(days=(5 - dt.date.today().weekday()) % 7)).isoformat()
+            today = dt.datetime.now(IST).date()
+            day = (today + dt.timedelta(days=(5 - today.weekday()) % 7)).isoformat()
             sl = await do.call("get_available_slots", {"restaurantId": rid, "date": day, **loc})
             save("dineout-slots", {"restaurantId": rid, "date": day, **loc}, sl)
             show("get_available_slots", sl, 3000)
