@@ -8,7 +8,7 @@ A Telegram bot for friend groups, built on Swiggy's MCP servers: it reads the ch
 
 [![Plan Bana demo](docs/media/demo.gif)](docs/media/plan-bana-demo.mp4)
 
-**▶ [Watch the 2-minute demo](docs/media/plan-bana-demo.mp4)** · real booking, recorded live on 30 Sep 2026
+**▶ [Watch the 2-minute demo](https://youtu.be/ocu2PfEBXic)** · real booking, recorded live on 30 Sep 2026
 
 ![Python](https://img.shields.io/badge/python-3.12+-3776AB?logo=python&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-174%20passing-3ddc84)
