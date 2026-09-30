@@ -15,3 +15,9 @@ __pycache__/
 
 # raw probe output contains real addresses/orders; sanitize before committing as fixtures
 probe_out/
+
+# demo video: node deps, rendered output and raw/cut recordings (large, contain personal screens)
+video/node_modules/
+video/out/
+video/public/clips/
+docs/demo/*.mp4
