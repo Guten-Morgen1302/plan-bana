@@ -9,7 +9,8 @@ bash cut_clips.sh                      # needs docs/demo/telegram demo.mp4 (not 
 npx remotion studio src/index.ts       # preview + scrub in the browser
 npx remotion render src/index.ts PlanBana out/plan-bana-silent.mp4 --codec=h264 --crf=18
 bash make_music.sh 138.2               # synthesized beat → out/music.wav
-ffmpeg -i out/plan-bana-silent.mp4 -i out/music.wav -c:v copy -c:a aac -b:a 192k -shortest out/plan-bana.mp4
+../.venv/Scripts/python make_vo.py     # Hinglish voice-over via Gemini TTS (voice Fenrir) → out/vo/
+../.venv/Scripts/python mix_audio.py   # voice + music ducked under it → out/plan-bana.mp4
 ```
 
 Honesty rules:
